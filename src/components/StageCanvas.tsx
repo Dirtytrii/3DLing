@@ -936,6 +936,7 @@ export function StageCanvas({ scene }: StageCanvasProps) {
       activeSpriteDisplay = null;
       delete host.dataset.spriteAsset;
       host.dataset.spriteLoaded = "false";
+      host.dataset.spriteTransition = "settled";
       toy.modelSlot.children.forEach(disposeObject);
       toy.modelSlot.clear();
     };
@@ -963,6 +964,7 @@ export function StageCanvas({ scene }: StageCanvasProps) {
       if (activeSpriteGroup) {
         host.dataset.modelState = "sprite";
         host.dataset.spriteLoaded = "false";
+        host.dataset.spriteTransition = "transitioning";
       } else {
         clearModelSlot();
         toy.placeholder.visible = true;
@@ -1062,7 +1064,8 @@ export function StageCanvas({ scene }: StageCanvasProps) {
           toy.placeholder.visible = false;
           host.dataset.modelState = "sprite";
           host.dataset.spriteAsset = display.imagePath;
-          host.dataset.spriteLoaded = "false";
+          host.dataset.spriteLoaded = "true";
+          host.dataset.spriteTransition = "transitioning";
         },
         undefined,
         () => {
@@ -1224,8 +1227,7 @@ export function StageCanvas({ scene }: StageCanvasProps) {
       });
       removableSpriteGroups.forEach(removeSpriteGroup);
       if (activeSpriteGroup) {
-        const activeOpacity = activeSpriteGroup.userData.currentOpacity ?? 0;
-        host.dataset.spriteLoaded = !activeSpriteGroup.userData.exiting && activeOpacity >= 0.985 ? "true" : "false";
+        host.dataset.spriteLoaded = !activeSpriteGroup.userData.exiting ? "true" : "false";
       }
       host.dataset.spriteTransition = spriteTransitioning ? "transitioning" : "settled";
       if (isRedWheatConcert(current)) {

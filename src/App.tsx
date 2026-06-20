@@ -1,8 +1,18 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { LoadingScreen } from "./components/LoadingScreen";
 import { SceneBackground } from "./components/SceneBackground";
 import { StageCanvas } from "./components/StageCanvas";
 import { StorySection } from "./components/StorySection";
-import { scenes, wallPhotos } from "./data/scenes";
+import { scenes, type StoryScene, wallPhotos } from "./data/scenes";
+
+const BOOT_MIN_MS = 1100;
+const BOOT_ASSET_TIMEOUT_MS = 20000;
+const BOOT_RENDER_TIMEOUT_MS = 30000;
+
+type IdleWindow = Window & {
+  requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
+  cancelIdleCallback?: (handle: number) => void;
+};
 
 const getHashSectionId = () => {
   const hash = window.location.hash.replace("#", "");
@@ -22,22 +32,146 @@ const scrollToSection = (id: string, behavior: ScrollBehavior) => {
   target?.scrollIntoView({ block: "start", inline: "nearest", behavior });
 };
 
+const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms));
+
+const preloadImage = (src: string) =>
+  new Promise<void>((resolve) => {
+    const image = new Image();
+    let settled = false;
+
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timer);
+      resolve();
+    };
+
+    const timer = window.setTimeout(finish, BOOT_ASSET_TIMEOUT_MS);
+    image.decoding = "async";
+    image.onload = finish;
+    image.onerror = finish;
+    image.src = src;
+    if (image.complete) finish();
+  });
+
+const waitForInitialSceneRender = (scene: StoryScene) =>
+  new Promise<void>((resolve) => {
+    const started = window.performance.now();
+
+    const check = () => {
+      const stage = document.querySelector<HTMLElement>(".stage-canvas");
+      const activeBackground = document.querySelector<HTMLElement>(".scene-background-layer.is-active");
+      const spriteExpected = !!scene.toyDisplay && scene.toyDisplay.assetReady !== false;
+      const modelReady = stage?.dataset.modelState === (spriteExpected ? "sprite" : "placeholder");
+      const spriteReady = !spriteExpected || stage?.dataset.spriteLoaded === "true";
+      const stageProfile = scene.stage.profile ?? "default";
+      const stageReady = stage?.dataset.stageProfile === stageProfile;
+      const backgroundReady = activeBackground?.dataset.backgroundScene === scene.id;
+      const timedOut = window.performance.now() - started > BOOT_RENDER_TIMEOUT_MS;
+
+      if ((stageReady && backgroundReady && modelReady && spriteReady) || timedOut) {
+        resolve();
+        return;
+      }
+
+      window.requestAnimationFrame(check);
+    };
+
+    window.requestAnimationFrame(check);
+  });
+
+const waitForInitialPhoto = (scene: StoryScene) =>
+  new Promise<void>((resolve) => {
+    let settled = false;
+    let cleanup = () => {};
+
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve();
+    };
+
+    const timeout = window.setTimeout(finish, BOOT_ASSET_TIMEOUT_MS);
+    const bindImage = () => {
+      if (settled) return;
+      const image = document.querySelector<HTMLImageElement>(`#${scene.id} .photo-stack img`);
+      if (!image) {
+        window.requestAnimationFrame(bindImage);
+        return;
+      }
+
+      if (image.complete && image.naturalWidth > 0) {
+        finish();
+        return;
+      }
+
+      const onDone = () => finish();
+      image.addEventListener("load", onDone, { once: true });
+      image.addEventListener("error", onDone, { once: true });
+      cleanup = () => {
+        window.clearTimeout(timeout);
+        image.removeEventListener("load", onDone);
+        image.removeEventListener("error", onDone);
+      };
+    };
+
+    cleanup = () => window.clearTimeout(timeout);
+    bindImage();
+  });
+
 function App() {
   const [activeSectionId, setActiveSectionId] = useState(getInitialSectionId);
   const [stageSceneId, setStageSceneId] = useState(getInitialStageSceneId);
+  const [bootReady, setBootReady] = useState(false);
   const activeScene = useMemo(
     () => scenes.find((scene) => scene.id === stageSceneId) ?? scenes[0],
     [stageSceneId]
   );
 
   useEffect(() => {
-    scenes.forEach((scene) => {
-      if (!scene.backgroundAsset?.imagePath) return;
-      const image = new Image();
-      image.decoding = "async";
-      image.src = scene.backgroundAsset.imagePath;
-    });
-  }, []);
+    if (bootReady) return;
+
+    let cancelled = false;
+
+    const boot = async () => {
+      await Promise.allSettled([
+        wait(BOOT_MIN_MS),
+        waitForInitialPhoto(activeScene),
+        waitForInitialSceneRender(activeScene)
+      ]);
+
+      if (!cancelled) {
+        setBootReady(true);
+      }
+    };
+
+    void boot();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeScene, bootReady]);
+
+  useEffect(() => {
+    if (!bootReady) return;
+
+    const idleWindow = window as IdleWindow;
+    const preloadRest = () => {
+      scenes.forEach((scene) => {
+        if (!scene.backgroundAsset?.imagePath || scene.id === activeScene.id) return;
+        void preloadImage(scene.backgroundAsset.imagePath);
+      });
+    };
+
+    if (idleWindow.requestIdleCallback) {
+      const handle = idleWindow.requestIdleCallback(preloadRest, { timeout: 3000 });
+      return () => idleWindow.cancelIdleCallback?.(handle);
+    }
+
+    const timer = window.setTimeout(preloadRest, 1400);
+    return () => window.clearTimeout(timer);
+  }, [activeScene.id, bootReady]);
 
   useLayoutEffect(() => {
     const hashId = getHashSectionId();
@@ -86,9 +220,10 @@ function App() {
   }, []);
 
   return (
-    <main>
+    <main className={`app-shell ${bootReady ? "is-ready" : "is-booting"}`} data-app-ready={bootReady ? "true" : "false"}>
       <SceneBackground scene={activeScene} />
       <StageCanvas scene={activeScene} />
+      <LoadingScreen ready={bootReady} />
 
       <nav className="scene-rail" aria-label="场景导航">
         {scenes.map((scene) => (
