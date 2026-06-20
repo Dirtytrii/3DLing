@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" role="img" aria-label="Playful college Halloween stage background">
+  <defs>
+    <linearGradient id="night" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#05020b"/>
+      <stop offset="0.42" stop-color="#14102b"/>
+      <stop offset="1" stop-color="#27100b"/>
+    </linearGradient>
+    <radialGradient id="purple" cx="74%" cy="35%" r="48%">
+      <stop offset="0" stop-color="#b96cff" stop-opacity="0.55"/>
+      <stop offset="0.52" stop-color="#6f39d6" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#6f39d6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orange" cx="83%" cy="72%" r="35%">
+      <stop offset="0" stop-color="#ff8c3a" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#ff8c3a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#night)"/>
+  <rect width="1920" height="1080" fill="url(#purple)"/>
+  <rect width="1920" height="1080" fill="url(#orange)"/>
+  <rect x="-60" width="760" height="1080" fill="#04020a" opacity="0.68"/>
+  <path d="M530 250 L1640 190 L1810 430 L720 500 Z" fill="#23213b" opacity="0.9"/>
+  <g opacity="0.55">
+    <rect x="610" y="250" width="90" height="250" fill="#141428"/>
+    <rect x="760" y="242" width="90" height="250" fill="#15152a"/>
+    <rect x="910" y="234" width="90" height="250" fill="#15152a"/>
+    <rect x="1060" y="226" width="90" height="250" fill="#15152a"/>
+    <rect x="1210" y="218" width="90" height="250" fill="#15152a"/>
+    <rect x="1360" y="210" width="90" height="250" fill="#15152a"/>
+  </g>
+  <g fill="#ffb35c" opacity="0.9">
+    <circle cx="655" cy="318" r="9"/>
+    <circle cx="805" cy="310" r="9"/>
+    <circle cx="955" cy="302" r="9"/>
+    <circle cx="1105" cy="294" r="9"/>
+    <circle cx="1255" cy="286" r="9"/>
+    <circle cx="1405" cy="278" r="9"/>
+  </g>
+  <path d="M0 765 L1920 704 L1920 1080 L0 1080 Z" fill="#080611"/>
+  <path d="M450 805 C710 725 1130 710 1660 765 L1920 1080 L250 1080 Z" fill="#1c1325"/>
+  <ellipse cx="1325" cy="790" rx="390" ry="120" fill="#3a2436"/>
+  <ellipse cx="1325" cy="776" rx="335" ry="86" fill="#4b2a3b"/>
+  <ellipse cx="1325" cy="760" rx="220" ry="44" fill="#a35ee8" opacity="0.2"/>
+  <g filter="url(#blur)" opacity="0.75">
+    <circle cx="1260" cy="670" r="170" fill="#9d55f2"/>
+    <circle cx="1550" cy="720" r="160" fill="#ff7a2e"/>
+  </g>
+  <g fill="#f47b2c">
+    <ellipse cx="1540" cy="820" rx="55" ry="42"/>
+    <rect x="1516" y="770" width="48" height="70" rx="24"/>
+    <path d="M1505 815 Q1540 845 1580 815" fill="#27100b"/>
+  </g>
+  <g fill="#f0e2ff" opacity="0.72">
+    <path d="M875 450 C830 430 820 500 850 510 C850 540 900 540 900 510 C940 500 925 430 875 450 Z"/>
+    <path d="M1490 420 C1445 400 1435 470 1465 480 C1465 510 1515 510 1515 480 C1555 470 1540 400 1490 420 Z"/>
+  </g>
+  <g fill="#c8a3ff" opacity="0.7">
+    <circle cx="1000" cy="150" r="4"/>
+    <circle cx="1130" cy="165" r="3"/>
+    <circle cx="1275" cy="138" r="4"/>
+    <circle cx="1420" cy="160" r="3"/>
+    <circle cx="1580" cy="145" r="5"/>
+  </g>
+  <rect width="1920" height="1080" fill="#020203" opacity="0.16"/>
+</svg>

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" role="img" aria-label="Sunny graduation lawn stage background">
+  <defs>
+    <linearGradient id="sky3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dff7ff"/>
+      <stop offset="0.52" stop-color="#f8f4d8"/>
+      <stop offset="1" stop-color="#14311f"/>
+    </linearGradient>
+    <radialGradient id="sun3" cx="72%" cy="18%" r="50%">
+      <stop offset="0" stop-color="#fff8c7" stop-opacity="0.9"/>
+      <stop offset="0.42" stop-color="#ffe49a" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#ffe49a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="grass3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#70b86a"/>
+      <stop offset="1" stop-color="#183d26"/>
+    </linearGradient>
+    <filter id="soft3" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#sky3)"/>
+  <rect width="1920" height="1080" fill="url(#sun3)"/>
+  <rect x="-40" width="760" height="1080" fill="#08110d" opacity="0.55"/>
+  <path d="M520 520 C850 430 1240 410 1920 485 L1920 1080 L0 1080 L0 640 C170 595 330 560 520 520 Z" fill="url(#grass3)"/>
+  <path d="M760 260 L1580 260 L1690 520 L650 520 Z" fill="#e9eee3" opacity="0.5"/>
+  <g stroke="#fff7dd" stroke-width="7" opacity="0.42">
+    <path d="M820 330 L820 520"/>
+    <path d="M960 300 L960 520"/>
+    <path d="M1100 292 L1100 520"/>
+    <path d="M1240 300 L1240 520"/>
+    <path d="M1380 330 L1380 520"/>
+    <path d="M760 385 L1585 385"/>
+  </g>
+  <path d="M0 780 C380 700 760 730 1120 780 C1410 820 1660 805 1920 760 L1920 1080 L0 1080 Z" fill="#1e512e"/>
+  <g opacity="0.28" stroke="#d5f2b8" stroke-width="2">
+    <path d="M0 850 C420 772 880 800 1920 760"/>
+    <path d="M0 970 C520 894 1020 914 1920 850"/>
+  </g>
+  <ellipse cx="1320" cy="785" rx="365" ry="112" fill="#f3e7c6"/>
+  <ellipse cx="1320" cy="773" rx="330" ry="85" fill="#6e8e5f"/>
+  <ellipse cx="1320" cy="755" rx="245" ry="55" fill="#bee6a2" opacity="0.9"/>
+  <ellipse cx="1320" cy="748" rx="215" ry="38" fill="#fff7c8" opacity="0.24"/>
+  <g fill="#fff5e8" opacity="0.78">
+    <circle cx="930" cy="620" r="5"/>
+    <circle cx="1050" cy="585" r="4"/>
+    <circle cx="1180" cy="612" r="4"/>
+    <circle cx="1530" cy="570" r="5"/>
+    <circle cx="1660" cy="640" r="4"/>
+  </g>
+  <g fill="#f8f0d8" opacity="0.55" filter="url(#soft3)">
+    <circle cx="1180" cy="320" r="120"/>
+    <circle cx="1410" cy="250" r="95"/>
+  </g>
+  <rect width="1920" height="1080" fill="#020402" opacity="0.1"/>
+</svg>

@@ -1,0 +1,8 @@
+.codegraph/
+node_modules/
+dist/
+tmp/
+
+# Local 3D tool runtime/cache artifacts
+tools/triposr-venv/
+tools/models/

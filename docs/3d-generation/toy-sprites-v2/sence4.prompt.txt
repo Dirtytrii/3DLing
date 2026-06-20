@@ -1,0 +1,18 @@
+Create one complete full-body 2.5D cute designer collectible toy sprite based on the provided Kunming film-camera/new-year reference board.
+
+Reference roles:
+- face: use the seated portrait reference as the face and hair direction, long dark hair, gentle calm look;
+- outfit/mood: use the dark puffer jacket and film-night travel feeling from the second reference;
+- props: a tiny film camera or small point-and-shoot camera can be held or worn as a subtle accessory.
+
+Final sprite requirements:
+- one complete toy figure only, generated as one integrated character, not collage, not dress-up, not vector;
+- soft plush material mixed with premium blind-box collectible proportions, original design, high-quality 2.5D cute 3D render;
+- dark puffer jacket should feel soft and rounded, with a warm film-photo memory mood;
+- full body vertical sprite, feet fully visible and level, subject centered, generous transparent-safe padding on all sides;
+- clean silhouette and smooth edges suitable for a Three.js sprite;
+- no background wall, no other person, no readable text, no logo, no watermark, no brand/IP marks.
+
+For chroma-key source generation:
+- use a perfectly flat solid #00ff00 background with no shadow, floor, gradient, texture, reflection, or lighting variation;
+- do not use #00ff00 anywhere in the toy.

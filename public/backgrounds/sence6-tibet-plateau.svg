@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" role="img" aria-label="Tibet plateau travel stage background">
+  <defs>
+    <linearGradient id="sky6" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#061427"/>
+      <stop offset="0.36" stop-color="#2d8ed8"/>
+      <stop offset="0.72" stop-color="#d9ecff"/>
+      <stop offset="1" stop-color="#1b2d31"/>
+    </linearGradient>
+    <radialGradient id="sun6" cx="72%" cy="20%" r="55%">
+      <stop offset="0" stop-color="#fff1a8" stop-opacity="0.72"/>
+      <stop offset="0.42" stop-color="#f5dba0" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#f5dba0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="stone6" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9fa89d"/>
+      <stop offset="0.58" stop-color="#596765"/>
+      <stop offset="1" stop-color="#222b2f"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#sky6)"/>
+  <rect width="1920" height="1080" fill="url(#sun6)"/>
+  <rect x="-80" width="790" height="1080" fill="#03101c" opacity="0.5"/>
+  <path d="M0 545 C280 360 520 420 760 300 C1020 170 1280 260 1500 205 C1680 160 1810 190 1920 150 L1920 730 L0 730 Z" fill="#e9f2f7" opacity="0.92"/>
+  <path d="M0 590 C360 430 620 500 820 390 C1050 260 1330 360 1540 295 C1720 245 1820 300 1920 255 L1920 760 L0 760 Z" fill="#8ba1ac"/>
+  <path d="M0 690 C420 625 760 625 1060 675 C1370 728 1600 672 1920 700 L1920 1080 L0 1080 Z" fill="#314f42"/>
+  <path d="M620 760 C930 680 1300 662 1920 760 L1920 1080 L420 1080 Z" fill="#5c6a5b"/>
+  <path d="M0 835 C380 772 780 795 1150 835 C1430 865 1660 825 1920 790 L1920 1080 L0 1080 Z" fill="#1b2b2c"/>
+  <g stroke-width="8" fill="none" opacity="0.9">
+    <path d="M930 340 C1120 300 1320 310 1540 360" stroke="#e9f5ff"/>
+    <path d="M930 340 C1120 390 1320 392 1540 360" stroke="#f8d35a"/>
+    <path d="M930 365 C1120 325 1320 335 1540 385" stroke="#d63d35"/>
+    <path d="M930 390 C1120 350 1320 360 1540 410" stroke="#4f9f59"/>
+    <path d="M930 415 C1120 375 1320 385 1540 435" stroke="#2b6fd4"/>
+  </g>
+  <g opacity="0.42" stroke="#f1efe2" stroke-width="2">
+    <path d="M0 930 C500 850 1060 872 1920 835"/>
+    <path d="M320 800 L230 1080"/>
+    <path d="M850 750 L820 1080"/>
+    <path d="M1320 750 L1395 1080"/>
+    <path d="M1680 760 L1820 1080"/>
+  </g>
+  <ellipse cx="1325" cy="805" rx="370" ry="112" fill="#d7c19a"/>
+  <ellipse cx="1325" cy="790" rx="330" ry="86" fill="#536265"/>
+  <ellipse cx="1325" cy="774" rx="250" ry="56" fill="#8f9c91"/>
+  <ellipse cx="1325" cy="762" rx="205" ry="38" fill="#f5dba0" opacity="0.22"/>
+  <g fill="#ffffff" opacity="0.52">
+    <circle cx="1110" cy="200" r="4"/>
+    <circle cx="1220" cy="160" r="3"/>
+    <circle cx="1400" cy="185" r="3"/>
+    <circle cx="1550" cy="220" r="4"/>
+    <circle cx="1665" cy="170" r="3"/>
+  </g>
+  <rect width="1920" height="1080" fill="#020508" opacity="0.12"/>
+</svg>

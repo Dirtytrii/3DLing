@@ -1,0 +1,31 @@
+{
+  "name": "3dling-gift-page",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc && vite build",
+    "generate:backgrounds": "node scripts/generate-scene-backgrounds.mjs",
+    "generate:toys:v2": "node scripts/generate-toy-sprites-v2.mjs",
+    "promote:toys:v2": "node scripts/promote-toy-assets-v2.mjs",
+    "qa:scenes": "node scripts/qa-scene-matrix.mjs",
+    "validate:asset-gate": "node scripts/validate-asset-gate.mjs",
+    "validate:toys": "node scripts/validate-toy-assets.mjs",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "three": "^0.181.2",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/three": "^0.184.1",
+    "playwright": "^1.61.0"
+  }
+}

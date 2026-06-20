@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" role="img" aria-label="Dali Bai traditional courtyard stage background">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07111b"/>
+      <stop offset="0.35" stop-color="#102c3a"/>
+      <stop offset="0.7" stop-color="#d7eef1"/>
+      <stop offset="1" stop-color="#fff0d6"/>
+    </linearGradient>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f4eb"/>
+      <stop offset="1" stop-color="#d8ddd5"/>
+    </linearGradient>
+    <linearGradient id="stone" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9e9b8d"/>
+      <stop offset="0.55" stop-color="#6e7069"/>
+      <stop offset="1" stop-color="#343834"/>
+    </linearGradient>
+    <radialGradient id="warm" cx="72%" cy="24%" r="48%">
+      <stop offset="0" stop-color="#ffd7a7" stop-opacity="0.75"/>
+      <stop offset="0.45" stop-color="#f0a76e" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#f0a76e" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <pattern id="tileLines" width="90" height="42" patternUnits="userSpaceOnUse">
+      <path d="M0 40 C22 28 52 28 90 40" fill="none" stroke="#2d3a3d" stroke-opacity="0.45" stroke-width="3"/>
+      <path d="M0 18 C22 8 52 8 90 18" fill="none" stroke="#657171" stroke-opacity="0.25" stroke-width="2"/>
+    </pattern>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+  <rect width="1920" height="1080" fill="url(#warm)"/>
+  <rect x="-80" y="0" width="780" height="1080" fill="#04070a" opacity="0.62"/>
+  <path d="M520 210 L940 80 L1510 175 L1940 60 L1940 310 L1510 420 L930 330 L520 420 Z" fill="#253235"/>
+  <path d="M520 210 L940 80 L1510 175 L1940 60 L1932 130 L1510 250 L932 158 L528 282 Z" fill="#5c7474"/>
+  <path d="M510 228 L1940 75 L1940 166 L520 325 Z" fill="url(#tileLines)" opacity="0.95"/>
+  <path d="M610 315 L1815 188 L1815 730 L610 805 Z" fill="url(#wall)" opacity="0.96"/>
+  <path d="M865 364 L1218 340 L1218 688 L865 722 Z" fill="#e9ece2" stroke="#536565" stroke-width="10"/>
+  <path d="M910 400 L1174 382 L1174 649 L910 676 Z" fill="#dce2dc" stroke="#8c362b" stroke-width="7"/>
+  <path d="M948 438 C1010 398 1085 395 1142 432 L1142 606 C1076 572 1012 574 948 611 Z" fill="none" stroke="#2e7e8e" stroke-width="12" opacity="0.9"/>
+  <path d="M960 462 C1014 438 1075 438 1132 461" fill="none" stroke="#c04b3f" stroke-width="8"/>
+  <path d="M960 562 C1014 538 1075 538 1132 561" fill="none" stroke="#c04b3f" stroke-width="8"/>
+  <path d="M1375 306 L1732 278 L1732 728 L1375 750 Z" fill="#2f2622"/>
+  <path d="M1415 352 L1690 332 L1690 710 L1415 724 Z" fill="#8b3428"/>
+  <g stroke="#d5b15d" stroke-width="10" opacity="0.9">
+    <path d="M1460 360 L1460 716"/>
+    <path d="M1518 354 L1518 714"/>
+    <path d="M1576 350 L1576 712"/>
+    <path d="M1634 344 L1634 710"/>
+    <path d="M1418 426 L1690 406"/>
+    <path d="M1418 506 L1690 488"/>
+    <path d="M1418 586 L1690 570"/>
+    <path d="M1418 666 L1690 650"/>
+  </g>
+  <path d="M0 790 L1920 708 L1920 1080 L0 1080 Z" fill="url(#stone)"/>
+  <g opacity="0.34" stroke="#d0c4a7" stroke-width="2">
+    <path d="M0 902 C400 850 920 824 1920 790"/>
+    <path d="M0 992 C520 934 1050 920 1920 878"/>
+    <path d="M360 782 L210 1080"/>
+    <path d="M780 758 L730 1080"/>
+    <path d="M1180 735 L1235 1080"/>
+    <path d="M1580 718 L1725 1080"/>
+  </g>
+  <ellipse cx="1325" cy="815" rx="360" ry="112" fill="#efe0bd" opacity="0.82"/>
+  <ellipse cx="1325" cy="815" rx="334" ry="92" fill="#8a745d" opacity="0.9"/>
+  <ellipse cx="1325" cy="800" rx="314" ry="74" fill="#b9ab90" opacity="0.92"/>
+  <ellipse cx="1325" cy="786" rx="232" ry="45" fill="#f8e3bc" opacity="0.2"/>
+  <ellipse cx="1322" cy="794" rx="350" ry="92" fill="#ffe1a2" opacity="0.2" filter="url(#soft)"/>
+  <g opacity="0.55" fill="#fff8da">
+    <circle cx="1120" cy="240" r="4"/>
+    <circle cx="1250" cy="190" r="3"/>
+    <circle cx="1480" cy="250" r="3"/>
+    <circle cx="1610" cy="350" r="2.5"/>
+    <circle cx="980" cy="310" r="2.5"/>
+  </g>
+  <rect width="1920" height="1080" fill="#020305" opacity="0.18"/>
+</svg>

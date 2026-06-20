@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "project": "3Dling",
+  "defaults": {
+    "toyStyle": "original soft plush plus premium designer blind-box collectible proportions, cute and warm, not photorealistic",
+    "negative": [
+      "celebrity likeness",
+      "artist name",
+      "brand logo",
+      "readable protected text",
+      "direct imitation of commercial toy IP",
+      "extra characters",
+      "watermark"
+    ]
+  },
+  "paths": {
+    "concepts": "assets/toy-concepts",
+    "models": "public/models",
+    "promptPacks": "docs/3d-generation"
+  },
+  "scenes": [
+    {
+      "id": "sence5",
+      "title": "海口第一次看海和演唱会",
+      "mainPhoto": "photos/sence5/3.jpg",
+      "toyReferences": {
+        "approvedPreview": [
+          "user-provided preview image with sunglasses on head and approved face shape"
+        ],
+        "face": [
+          "photos/sence5/1.jpg"
+        ],
+        "outfit": [
+          "photos/sence5/2.jpg",
+          "photos/sence5/3.jpg"
+        ],
+        "pose": [
+          "photos/sence5/2.jpg",
+          "photos/sence5/3.jpg"
+        ],
+        "mood": [
+          "photos/sence5/3.jpg",
+          "red wheat-field concert stage",
+          "dark stadium",
+          "warm seaside sunset"
+        ]
+      },
+      "stage": "Haikou memory stage: dark stadium, golden wheat field, red haze, low circular amber floor lights, one cool white spotlight, subtle sea-breeze sunset feeling.",
+      "props": [
+        "abstract concert ticket stub",
+        "tiny travel suitcase",
+        "small black handbag",
+        "warm wheat lights",
+        "subtle sea breeze ribbon"
+      ],
+      "toyStyle": "original cute collectible toy, soft plush texture mixed with premium blind-box proportions, rounded head, gentle eyes, compact body, handmade finish",
+      "mustPreserve": [
+        "long black wavy side-parted hair",
+        "approved preview face direction: narrower soft oval face, delicate jawline, calmer less-round eyes, smaller nose and mouth, more elegant expression",
+        "gentle calm gaze",
+        "tiny sparkle detail near the eye or forehead",
+        "black sunglasses resting on top of the head, not covering the eyes",
+        "black mini dress or fitted black top silhouette",
+        "ornate circular metallic belt",
+        "small black handbag",
+        "black socks or boots"
+      ],
+      "outputs": {
+        "concept": "assets/toy-concepts/sence5-concept-v3.png",
+        "cleanInput": "assets/toy-concepts/sence5-toy-triposr-input-v1.png",
+        "promptPack": "docs/3d-generation/sence5-prompt-pack.md",
+        "model": "public/models/sence5.glb",
+        "modelStatus": "technical prototype / not display-approved",
+        "nextModel": "public/models/sence5-v2.glb",
+        "nextTurntable": "assets/toy-concepts/sence5-turntable-v2.png"
+      },
+      "privacy": {
+        "externalUploadAllowed": true,
+        "notes": "User allows external services, but report service/model and uploaded inputs."
+      },
+      "ipSafety": {
+        "mustAvoid": [
+          "Kanye name",
+          "Ye logo",
+          "Vultures text",
+          "celebrity likeness",
+          "stage brand logo",
+          "readable protected text",
+          "Jellycat name or direct design imitation",
+          "Pop Mart name or direct design imitation"
+        ]
+      }
+    }
+  ],
+  "futureSceneFieldSpec": {
+    "sence1": "childhood version; use one main childhood photo and role-map face/outfit/mood before generation",
+    "sence2": "university Halloween version; preserve playful makeup and outfit cues from selected references",
+    "sence3": "graduation photo version; preserve graduation outfit, ceremony mood, and commemorative props",
+    "sence4": "Kunming film-camera/new-year version; face uses photos/sence4/1.jpg, main photo uses photos/sence4/2.jpg",
+    "sence5": "complete sample scene in this manifest",
+    "sence6": "Tibet travel version; select one main photo and map face/outfit/mood from references"
+  }
+}
