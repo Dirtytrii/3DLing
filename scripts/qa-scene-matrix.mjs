@@ -231,6 +231,7 @@ async function startServer(options) {
 async function collectState(page, sceneId) {
   return await page.evaluate((id) => {
     const activeRail = document.querySelector(".scene-rail a.active");
+    const appShell = document.querySelector(".app-shell");
     const target = document.getElementById(id);
     const stage = document.querySelector(".stage-canvas");
     const activeBackground = document.querySelector(".scene-background-layer.is-active");
@@ -241,11 +242,13 @@ async function collectState(page, sceneId) {
     return {
       title: document.title,
       url: window.location.href,
+      appReady: appShell?.getAttribute("data-app-ready") ?? "",
       activeHref: activeRail?.getAttribute("href") ?? "",
       targetTop: targetRect?.top ?? null,
       modelState: stage?.getAttribute("data-model-state") ?? "",
       stageProfile: stage?.getAttribute("data-stage-profile") ?? "",
       spriteLoaded: stage?.getAttribute("data-sprite-loaded") ?? "",
+      spriteTransition: stage?.getAttribute("data-sprite-transition") ?? "",
       spriteAsset: stage?.getAttribute("data-sprite-asset") ?? "",
       activeBackgroundScene: activeBackground?.getAttribute("data-background-scene") ?? "",
       backgroundLayerCount: document.querySelectorAll(".scene-background-layer").length,
@@ -268,12 +271,15 @@ async function waitForScene(page, sceneId, expectation) {
     lastState = await collectState(page, sceneId);
     const isReady =
       lastState.activeHref === `#${sceneId}` &&
+      lastState.appReady === "true" &&
       lastState.targetTop !== null &&
       Math.abs(lastState.targetTop) < 8 &&
       lastState.modelState === expectation.expectedModelState &&
       lastState.stageProfile === expectation.stageProfile &&
       (expectation.expectedModelState !== "sprite" ||
-        (lastState.spriteLoaded === "true" && lastState.spriteAsset === expectation.imagePath));
+        (lastState.spriteLoaded === "true" &&
+          lastState.spriteTransition === "settled" &&
+          lastState.spriteAsset === expectation.imagePath));
 
     if (isReady) return;
 
@@ -300,6 +306,7 @@ async function waitForScene(page, sceneId, expectation) {
 function assertState(state, sceneId, expectation) {
   const failures = [];
   if (!state.title) failures.push("document title is empty");
+  if (state.appReady !== "true") failures.push(`app ready ${state.appReady}, expected true`);
   if (state.activeHref !== `#${sceneId}`) failures.push(`active rail ${state.activeHref}, expected #${sceneId}`);
   if (state.targetTop === null || Math.abs(state.targetTop) > 8) failures.push(`target top ${state.targetTop}, expected near 0`);
   if (state.modelState !== expectation.expectedModelState) {
@@ -311,6 +318,9 @@ function assertState(state, sceneId, expectation) {
   if (expectation.expectedModelState === "sprite") {
     if (state.spriteLoaded !== "true") {
       failures.push(`sprite loaded ${state.spriteLoaded}, expected true`);
+    }
+    if (state.spriteTransition !== "settled") {
+      failures.push(`sprite transition ${state.spriteTransition}, expected settled`);
     }
     if (state.spriteAsset !== expectation.imagePath) {
       failures.push(`sprite asset ${state.spriteAsset}, expected ${expectation.imagePath}`);
@@ -360,7 +370,7 @@ async function runDirectMatrix(browser, baseUrl, options, expectations) {
       page.on("requestfailed", (request) => requestIssues.push(`request failed: ${request.url()} ${request.failure()?.errorText ?? ""}`));
       page.on("response", (response) => recordRequestIssues(requestIssues, response.request(), response));
 
-      await page.goto(`${baseUrl}/#${sceneId}`, { waitUntil: "networkidle" });
+      await page.goto(`${baseUrl}/#${sceneId}`, { waitUntil: "load" });
       await waitForScene(page, sceneId, expectation);
       const state = await collectState(page, sceneId);
       assertState(state, sceneId, expectation);
@@ -404,7 +414,11 @@ async function runNavigationCheck(browser, baseUrl, expectations) {
   page.on("requestfailed", (request) => requestIssues.push(`request failed: ${request.url()} ${request.failure()?.errorText ?? ""}`));
   page.on("response", (response) => recordRequestIssues(requestIssues, response.request(), response));
 
-  await page.goto(`${baseUrl}/#sence1`, { waitUntil: "networkidle" });
+  await page.goto(`${baseUrl}/#sence1`, { waitUntil: "load" });
+  await page.waitForFunction(
+    () => document.querySelector(".app-shell")?.getAttribute("data-app-ready") === "true",
+    { timeout: sceneSettleTimeoutMs }
+  );
 
   for (const id of navigationIds) {
     await page.locator(`.scene-rail a[href="#${id}"]`).click();
