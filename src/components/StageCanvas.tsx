@@ -1012,14 +1012,19 @@ export function StageCanvas({ scene }: StageCanvasProps) {
             new THREE.MeshBasicMaterial({
               color: "#060203",
               transparent: true,
-              opacity: 0.34,
+              opacity: display.contactShadow?.opacity ?? 0.34,
               depthWrite: false,
               depthTest: false
             })
           );
+          const shadowScale = display.contactShadow?.scale ?? [1.08, 0.32];
           shadow.rotation.x = -Math.PI / 2;
-          shadow.position.set(0, -height * 0.5 + 0.015, 0.04);
-          shadow.scale.set(1.08, 0.32, 1);
+          shadow.position.set(
+            display.contactShadow?.xOffset ?? 0,
+            -height * 0.5 + 0.015 + (display.contactShadow?.yOffset ?? 0),
+            display.contactShadow?.zOffset ?? 0.04
+          );
+          shadow.scale.set(shadowScale[0], shadowScale[1], 1);
           shadow.renderOrder = 1;
           prepareFadeMaterial(shadow.material);
 

@@ -31,6 +31,13 @@ export interface StoryScene {
       aspect: number;
       position: [number, number, number];
     }[];
+    contactShadow?: {
+      xOffset?: number;
+      yOffset?: number;
+      zOffset?: number;
+      scale?: [number, number];
+      opacity?: number;
+    };
     keyLight?: boolean;
     rotation?: [number, number, number];
     glowColor?: string;
@@ -173,6 +180,7 @@ export const scenes: StoryScene[] = [
         { aspect: 1.84, position: [-0.48, 1.22, 0.08] },
         { aspect: 2.0, position: [-0.52, 1.22, 0.08] }
       ],
+      contactShadow: { yOffset: 0.07, scale: [0.9, 0.26], opacity: 0.32 },
       rotation: [0, -0.04, 0],
       glowColor: "#b96cff"
     },
@@ -242,6 +250,7 @@ export const scenes: StoryScene[] = [
         { aspect: 1.84, position: [-0.5, 1.17, 0.08] },
         { aspect: 2.0, position: [-0.54, 1.17, 0.08] }
       ],
+      contactShadow: { yOffset: 0.16, scale: [0.76, 0.22], opacity: 0.3 },
       rotation: [0, -0.03, 0],
       glowColor: "#74d1a6"
     },
@@ -308,6 +317,7 @@ export const scenes: StoryScene[] = [
         { aspect: 1.84, position: [-0.5, 1.16, 0.08] },
         { aspect: 2.0, position: [-0.54, 1.16, 0.08] }
       ],
+      contactShadow: { yOffset: 0.12, scale: [0.78, 0.22], opacity: 0.3 },
       rotation: [0, -0.03, 0],
       glowColor: "#ff9c73"
     },
@@ -453,6 +463,7 @@ export const scenes: StoryScene[] = [
         { aspect: 1.84, position: [-0.54, 1.23, 0.08] },
         { aspect: 2.0, position: [-0.58, 1.23, 0.08] }
       ],
+      contactShadow: { yOffset: 0.1, scale: [0.82, 0.24], opacity: 0.3 },
       rotation: [0, -0.03, 0],
       glowColor: "#6bb7ff"
     },
