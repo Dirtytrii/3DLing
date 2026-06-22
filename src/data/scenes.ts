@@ -4,7 +4,8 @@ export type SceneMood =
   | "graduation"
   | "kunming"
   | "haikou"
-  | "tibet";
+  | "tibet"
+  | "shangriLa";
 
 export interface StoryScene {
   id: string;
@@ -13,6 +14,7 @@ export interface StoryScene {
   period: string;
   copy: string;
   mainPhoto: string;
+  photoStack?: string[];
   modelPath: string;
   modelReady: boolean;
   modelTransform?: {
@@ -105,6 +107,10 @@ export const scenes: StoryScene[] = [
     period: "还没遇见你",
     copy: "那时候我还不知道，未来会有一个这么可爱的人走进我的生活。",
     mainPhoto: "/photos/sence1/1a0fbaf177519bb0490055fde45b3c82.jpg",
+    photoStack: [
+      "/photos/sence1/1a0fbaf177519bb0490055fde45b3c82.jpg",
+      "/photos/sence1/51091af19439881997d8a446254314e5.jpg"
+    ],
     modelPath: "/models/sence1.glb",
     modelReady: false,
     toyDisplay: {
@@ -164,6 +170,11 @@ export const scenes: StoryScene[] = [
     period: "大学",
     copy: "搞怪、明亮、毫不费力地成为那天最特别的画面。",
     mainPhoto: "/photos/sence2/2c7b6ef66e62b1580398a4e6bd7e682d.jpg",
+    photoStack: [
+      "/photos/sence2/2c7b6ef66e62b1580398a4e6bd7e682d.jpg",
+      "/photos/sence2/e340f687dfa72fc05e4d5b40dd66b9e3.jpg",
+      "/photos/sence2/f77e849a5f04967fce33a7c5030cf0b0.jpg"
+    ],
     modelPath: "/models/sence2.glb",
     modelReady: false,
     toyDisplay: {
@@ -234,6 +245,10 @@ export const scenes: StoryScene[] = [
     period: "大学毕业",
     copy: "有些照片像一个句号，也像新的开头。",
     mainPhoto: "/photos/sence3/eb9ecb0bd1ff455cfdc9132f0877d4b6.jpg",
+    photoStack: [
+      "/photos/sence3/eb9ecb0bd1ff455cfdc9132f0877d4b6.jpg",
+      "/photos/sence3/0a9953257f91c2fae1b7715aa81de4c3.jpg"
+    ],
     modelPath: "/models/sence3.glb",
     modelReady: false,
     toyDisplay: {
@@ -301,6 +316,7 @@ export const scenes: StoryScene[] = [
     period: "第一次胶片机",
     copy: "跨年前后的昆明，被胶片偷偷留下了一点柔软的光。",
     mainPhoto: "/photos/sence4/2.jpg",
+    photoStack: ["/photos/sence4/2.jpg", "/photos/sence4/1.jpg"],
     modelPath: "/models/sence4.glb",
     modelReady: false,
     toyDisplay: {
@@ -368,6 +384,7 @@ export const scenes: StoryScene[] = [
     period: "第一次一起看海",
     copy: "第一次一起坐飞机，第一次一起看海，也把一整片红色麦田记在了晚上。",
     mainPhoto: "/photos/sence5/3.jpg",
+    photoStack: ["/photos/sence5/3.jpg", "/photos/sence5/1.jpg", "/photos/sence5/2.jpg"],
     modelPath: "/models/sence5.glb",
     modelReady: false,
     modelTransform: {
@@ -443,10 +460,18 @@ export const scenes: StoryScene[] = [
   {
     id: "sence6",
     order: 6,
-    title: "西藏",
+    title: "香格里拉",
     period: "她自己的远方",
-    copy: "你走向很远的地方，也把自由拍得很好看。",
+    copy: "你走向香格里拉的风里，也把自由拍得很好看。",
     mainPhoto: "/photos/sence6/78720d4affcbe16b30b8f3932ac81ac5.jpg",
+    photoStack: [
+      "/photos/sence6/78720d4affcbe16b30b8f3932ac81ac5.jpg",
+      "/photos/sence6/5ad6a40732733000ab60899abbc7a2e1.jpg",
+      "/photos/sence6/5d28b1594f3f41844e6b59c1d4f72357.jpg",
+      "/photos/sence6/89c15430f4c2cccc26dd223f4c88a525.jpg",
+      "/photos/sence6/b0f83b87d8fa82b9a51de59b9dcf5a6b.jpg",
+      "/photos/sence6/f17e774255d76ca78e94420861169106.jpg"
+    ],
     modelPath: "/models/sence6.glb",
     modelReady: false,
     toyDisplay: {
@@ -489,7 +514,7 @@ export const scenes: StoryScene[] = [
       mobileMid: 0.58,
       mobileEnd: 0.13
     },
-    mood: "tibet",
+    mood: "shangriLa",
     toyReferences: {
       face: [
         "/photos/sence6/5ad6a40732733000ab60899abbc7a2e1.jpg",
@@ -499,10 +524,10 @@ export const scenes: StoryScene[] = [
         "/photos/sence6/78720d4affcbe16b30b8f3932ac81ac5.jpg",
         "/photos/sence6/f17e774255d76ca78e94420861169106.jpg"
       ],
-      mood: ["Tibet", "clear sky", "travel freedom"]
+      mood: ["Shangri-La", "clear sky", "travel freedom"]
     },
     stage: {
-      name: "高原晴空",
+      name: "香格里拉晴空",
       accent: "#6bb7ff",
       secondary: "#f5dba0",
       floor: "#0f1c25"

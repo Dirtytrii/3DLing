@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import type { StoryScene } from "../data/scenes";
 
 interface StorySectionProps {
@@ -7,7 +7,10 @@ interface StorySectionProps {
 }
 
 export function StorySection({ scene, active }: StorySectionProps) {
+  const [selectedPhoto, setSelectedPhoto] = useState(scene.mainPhoto);
   const stageProfileClass = scene.stage.profile ? ` stage-${scene.stage.profile}` : "";
+  const gallery = useMemo(() => Array.from(new Set([scene.mainPhoto, ...(scene.photoStack ?? [])])), [scene.mainPhoto, scene.photoStack]);
+  const visibleBackCards = gallery.filter((photo) => photo !== selectedPhoto).slice(0, 2);
   const style = {
     "--photo-scene-w": scene.photoLayout?.width,
     "--photo-margin-left": scene.photoLayout?.marginLeft,
@@ -29,6 +32,10 @@ export function StorySection({ scene, active }: StorySectionProps) {
     "--copy-mask-mobile-end": scene.copyMask?.mobileEnd
   } as CSSProperties;
 
+  useEffect(() => {
+    setSelectedPhoto(scene.mainPhoto);
+  }, [scene.id, scene.mainPhoto]);
+
   return (
     <section className={`story-section${stageProfileClass} ${active ? "is-active" : ""}`} data-scene={scene.id} id={scene.id} style={style}>
       <div className="story-copy">
@@ -38,10 +45,29 @@ export function StorySection({ scene, active }: StorySectionProps) {
         <p className="sentence">{scene.copy}</p>
       </div>
 
-      <figure className="photo-stack" aria-label={`${scene.title}主照片`}>
-        <span className="photo-shadow photo-shadow-one" />
-        <span className="photo-shadow photo-shadow-two" />
-        <img src={scene.mainPhoto} alt={`${scene.title}主照片`} loading="lazy" decoding="async" />
+      <figure className="photo-stack" aria-label={`${scene.title}照片`}>
+        {visibleBackCards.map((photo, index) => (
+          <button
+            aria-label={`切换到${scene.title}照片 ${gallery.indexOf(photo) + 1}`}
+            className={`photo-card photo-card-back photo-shadow-${index === 0 ? "one" : "two"}`}
+            data-photo-card="back"
+            data-photo-src={photo}
+            key={photo}
+            onClick={() => setSelectedPhoto(photo)}
+            type="button"
+          >
+            <img src={photo} alt={`${scene.title}照片 ${gallery.indexOf(photo) + 1}`} loading="lazy" decoding="async" />
+          </button>
+        ))}
+        <img
+          key={selectedPhoto}
+          className="photo-main-image"
+          data-photo-main="true"
+          src={selectedPhoto}
+          alt={`${scene.title}主照片`}
+          loading="lazy"
+          decoding="async"
+        />
       </figure>
     </section>
   );
