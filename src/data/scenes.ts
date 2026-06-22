@@ -129,7 +129,7 @@ export const scenes: StoryScene[] = [
       position: "center center",
       mobilePosition: "58% center",
       opacity: 0.96,
-      mask: { left: 0.26, mid: 0.06, right: 0.14 }
+      mask: { left: 0.12, mid: 0.03, right: 0.1 }
     },
     photoLayout: {
       width: "clamp(282px, 24vw, 390px)",
@@ -138,12 +138,12 @@ export const scenes: StoryScene[] = [
       mobileX: "clamp(4px, 3vw, 24px)"
     },
     copyMask: {
-      desktopStart: 0.74,
-      desktopMid: 0.42,
-      desktopEnd: 0.05,
-      mobileStart: 0.94,
-      mobileMid: 0.58,
-      mobileEnd: 0.14
+      desktopStart: 0.54,
+      desktopMid: 0.26,
+      desktopEnd: 0.03,
+      mobileStart: 0.74,
+      mobileMid: 0.38,
+      mobileEnd: 0.1
     },
     mood: "childhood",
     toyReferences: {
@@ -201,7 +201,7 @@ export const scenes: StoryScene[] = [
       position: "center center",
       mobilePosition: "58% center",
       opacity: 0.96,
-      mask: { left: 0.24, mid: 0.06, right: 0.14 }
+      mask: { left: 0.14, mid: 0.03, right: 0.1 }
     },
     photoLayout: {
       width: "clamp(282px, 24vw, 390px)",
@@ -210,12 +210,12 @@ export const scenes: StoryScene[] = [
       mobileX: "clamp(4px, 3vw, 24px)"
     },
     copyMask: {
-      desktopStart: 0.72,
-      desktopMid: 0.4,
-      desktopEnd: 0.05,
-      mobileStart: 0.94,
-      mobileMid: 0.58,
-      mobileEnd: 0.14
+      desktopStart: 0.56,
+      desktopMid: 0.28,
+      desktopEnd: 0.04,
+      mobileStart: 0.76,
+      mobileMid: 0.4,
+      mobileEnd: 0.11
     },
     mood: "halloween",
     toyReferences: {
@@ -275,7 +275,7 @@ export const scenes: StoryScene[] = [
       position: "center center",
       mobilePosition: "58% center",
       opacity: 0.95,
-      mask: { left: 0.24, mid: 0.05, right: 0.12 }
+      mask: { left: 0.13, mid: 0.03, right: 0.09 }
     },
     photoLayout: {
       width: "clamp(278px, 23vw, 380px)",
@@ -284,12 +284,12 @@ export const scenes: StoryScene[] = [
       mobileX: "clamp(4px, 3vw, 24px)"
     },
     copyMask: {
-      desktopStart: 0.72,
-      desktopMid: 0.38,
-      desktopEnd: 0.04,
-      mobileStart: 0.94,
-      mobileMid: 0.56,
-      mobileEnd: 0.12
+      desktopStart: 0.54,
+      desktopMid: 0.26,
+      desktopEnd: 0.03,
+      mobileStart: 0.74,
+      mobileMid: 0.38,
+      mobileEnd: 0.1
     },
     mood: "graduation",
     toyReferences: {
@@ -343,7 +343,7 @@ export const scenes: StoryScene[] = [
       position: "center center",
       mobilePosition: "58% center",
       opacity: 0.96,
-      mask: { left: 0.24, mid: 0.06, right: 0.13 }
+      mask: { left: 0.14, mid: 0.03, right: 0.1 }
     },
     photoLayout: {
       width: "clamp(300px, 25vw, 420px)",
@@ -352,12 +352,12 @@ export const scenes: StoryScene[] = [
       mobileX: "clamp(4px, 3vw, 24px)"
     },
     copyMask: {
-      desktopStart: 0.72,
-      desktopMid: 0.4,
+      desktopStart: 0.56,
+      desktopMid: 0.28,
       desktopEnd: 0.04,
-      mobileStart: 0.94,
-      mobileMid: 0.58,
-      mobileEnd: 0.13
+      mobileStart: 0.76,
+      mobileMid: 0.4,
+      mobileEnd: 0.11
     },
     mood: "kunming",
     toyReferences: {
@@ -498,7 +498,7 @@ export const scenes: StoryScene[] = [
       position: "center center",
       mobilePosition: "58% center",
       opacity: 0.96,
-      mask: { left: 0.24, mid: 0.05, right: 0.13 }
+      mask: { left: 0.13, mid: 0.03, right: 0.1 }
     },
     photoLayout: {
       width: "clamp(282px, 24vw, 390px)",
@@ -507,12 +507,12 @@ export const scenes: StoryScene[] = [
       mobileX: "clamp(4px, 3vw, 24px)"
     },
     copyMask: {
-      desktopStart: 0.72,
-      desktopMid: 0.4,
+      desktopStart: 0.56,
+      desktopMid: 0.28,
       desktopEnd: 0.04,
-      mobileStart: 0.94,
-      mobileMid: 0.58,
-      mobileEnd: 0.13
+      mobileStart: 0.76,
+      mobileMid: 0.4,
+      mobileEnd: 0.11
     },
     mood: "shangriLa",
     toyReferences: {
