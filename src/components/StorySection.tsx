@@ -46,19 +46,26 @@ export function StorySection({ scene, active }: StorySectionProps) {
       </div>
 
       <figure className="photo-stack" aria-label={`${scene.title}照片`}>
-        {visibleBackCards.map((photo, index) => (
-          <button
-            aria-label={`切换到${scene.title}照片 ${gallery.indexOf(photo) + 1}`}
-            className={`photo-card photo-card-back photo-shadow-${index === 0 ? "one" : "two"}`}
-            data-photo-card="back"
-            data-photo-src={photo}
-            key={photo}
-            onClick={() => setSelectedPhoto(photo)}
-            type="button"
-          >
-            <img src={photo} alt={`${scene.title}照片 ${gallery.indexOf(photo) + 1}`} loading="lazy" decoding="async" />
-          </button>
-        ))}
+        {visibleBackCards.map((photo, index) => {
+          const photoIndex = gallery.indexOf(photo) + 1;
+          const layer = index === 0 ? "one" : "two";
+
+          return (
+            <div className={`photo-card-layer photo-card-layer-${layer}`} key={photo}>
+              <button
+                aria-label={`切换到${scene.title}照片 ${photoIndex}`}
+                className={`photo-card-hit photo-card-hit-${layer}`}
+                data-photo-card="back"
+                data-photo-src={photo}
+                onClick={() => setSelectedPhoto(photo)}
+                type="button"
+              />
+              <span className={`photo-card photo-card-visual photo-shadow-${layer}`} aria-hidden="true">
+                <img src={photo} alt="" loading="lazy" decoding="async" />
+              </span>
+            </div>
+          );
+        })}
         <img
           key={selectedPhoto}
           className="photo-main-image"
