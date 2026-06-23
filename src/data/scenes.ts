@@ -40,6 +40,11 @@ export interface StoryScene {
       scale?: [number, number];
       opacity?: number;
     };
+    fillLight?: {
+      color?: string;
+      opacity?: number;
+      scale?: number;
+    };
     keyLight?: boolean;
     rotation?: [number, number, number];
     glowColor?: string;
@@ -120,6 +125,7 @@ export const scenes: StoryScene[] = [
       height: 1.52,
       position: [-0.2, 1.1, 0.08],
       mobilePosition: [-0.08, 0.45, 0.08],
+      fillLight: { color: "#fff1d6", opacity: 0.18 },
       rotation: [0, -0.03, 0],
       glowColor: "#f7b267"
     },
@@ -192,6 +198,7 @@ export const scenes: StoryScene[] = [
         { aspect: 2.0, position: [-0.52, 1.22, 0.08] }
       ],
       contactShadow: { yOffset: 0.07, scale: [0.9, 0.26], opacity: 0.32 },
+      fillLight: { color: "#ffe7c7", opacity: 0.2 },
       rotation: [0, -0.04, 0],
       glowColor: "#b96cff"
     },
@@ -266,6 +273,7 @@ export const scenes: StoryScene[] = [
         { aspect: 2.0, position: [-0.54, 1.17, 0.08] }
       ],
       contactShadow: { yOffset: 0.16, scale: [0.76, 0.22], opacity: 0.3 },
+      fillLight: { color: "#fff5dd", opacity: 0.22 },
       rotation: [0, -0.03, 0],
       glowColor: "#74d1a6"
     },
@@ -334,6 +342,7 @@ export const scenes: StoryScene[] = [
         { aspect: 2.0, position: [-0.54, 1.16, 0.08] }
       ],
       contactShadow: { yOffset: 0.12, scale: [0.78, 0.22], opacity: 0.3 },
+      fillLight: { color: "#ffe4cc", opacity: 0.2 },
       rotation: [0, -0.03, 0],
       glowColor: "#ff9c73"
     },
@@ -489,6 +498,7 @@ export const scenes: StoryScene[] = [
         { aspect: 2.0, position: [-0.58, 1.23, 0.08] }
       ],
       contactShadow: { yOffset: 0.1, scale: [0.82, 0.24], opacity: 0.3 },
+      fillLight: { color: "#eaf6ff", opacity: 0.22 },
       rotation: [0, -0.03, 0],
       glowColor: "#6bb7ff"
     },
@@ -498,7 +508,7 @@ export const scenes: StoryScene[] = [
       position: "center center",
       mobilePosition: "58% center",
       opacity: 0.96,
-      mask: { left: 0.13, mid: 0.03, right: 0.1 }
+      mask: { left: 0.08, mid: 0.02, right: 0.08 }
     },
     photoLayout: {
       width: "clamp(282px, 24vw, 390px)",
@@ -507,12 +517,12 @@ export const scenes: StoryScene[] = [
       mobileX: "clamp(4px, 3vw, 24px)"
     },
     copyMask: {
-      desktopStart: 0.56,
-      desktopMid: 0.28,
+      desktopStart: 0.48,
+      desktopMid: 0.22,
       desktopEnd: 0.04,
-      mobileStart: 0.76,
-      mobileMid: 0.4,
-      mobileEnd: 0.11
+      mobileStart: 0.68,
+      mobileMid: 0.34,
+      mobileEnd: 0.09
     },
     mood: "shangriLa",
     toyReferences: {

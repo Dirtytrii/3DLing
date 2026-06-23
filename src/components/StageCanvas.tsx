@@ -71,6 +71,11 @@ type SpriteDisplay = NonNullable<StoryScene["toyDisplay"]>;
 type SpritePosition = [number, number, number];
 
 const DEFAULT_SPRITE_POSITION: SpritePosition = [0, 0.18, 0.08];
+const DEFAULT_SPRITE_FILL_LIGHT = {
+  color: "#fff0d6",
+  opacity: 0.16,
+  scale: 1.002
+};
 
 const lerp = (start: number, end: number, amount: number) => start + (end - start) * amount;
 
@@ -1009,6 +1014,33 @@ export function StageCanvas({ scene }: StageCanvasProps) {
           doll.renderOrder = 3;
           prepareFadeMaterial(doll.material);
 
+          const fillLightConfig = display.fillLight;
+          const fillLight =
+            fillLightConfig && (fillLightConfig.opacity ?? DEFAULT_SPRITE_FILL_LIGHT.opacity) > 0
+              ? new THREE.Mesh(
+                  geometry.clone(),
+                  new THREE.MeshBasicMaterial({
+                    map: texture.clone(),
+                    color: fillLightConfig.color ?? DEFAULT_SPRITE_FILL_LIGHT.color,
+                    transparent: true,
+                    opacity: fillLightConfig.opacity ?? DEFAULT_SPRITE_FILL_LIGHT.opacity,
+                    alphaTest: 0.05,
+                    depthWrite: false,
+                    depthTest: false,
+                    blending: THREE.AdditiveBlending,
+                    side: THREE.DoubleSide,
+                    toneMapped: false
+                  })
+                )
+              : null;
+          if (fillLight) {
+            const fillScale = fillLightConfig?.scale ?? DEFAULT_SPRITE_FILL_LIGHT.scale;
+            fillLight.position.z = 0.034;
+            fillLight.scale.set(fillScale, fillScale, 1);
+            fillLight.renderOrder = 3.5;
+            prepareFadeMaterial(fillLight.material);
+          }
+
           const shadow = new THREE.Mesh(
             new THREE.CircleGeometry(0.46, 48),
             new THREE.MeshBasicMaterial({
@@ -1032,6 +1064,9 @@ export function StageCanvas({ scene }: StageCanvasProps) {
 
           applySpritePlacement(spriteGroup, display);
           spriteGroup.add(shadow, doll);
+          if (fillLight) {
+            spriteGroup.add(fillLight);
+          }
 
           const useKeyLight = isRedWheatConcert(next) || display.keyLight === true;
           if (useKeyLight) {
