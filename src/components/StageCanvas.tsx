@@ -76,6 +76,11 @@ const DEFAULT_SPRITE_FILL_LIGHT = {
   opacity: 0.16,
   scale: 1.002
 };
+const DEFAULT_SPRITE_BODY_LIFT = {
+  color: "#fff7ea",
+  opacity: 0.1,
+  scale: 1
+};
 
 const lerp = (start: number, end: number, amount: number) => start + (end - start) * amount;
 
@@ -422,6 +427,24 @@ const createSpriteKeyLightTexture = () =>
     ctx.fillStyle = bodyGlow;
     ctx.fillRect(0, 0, width, height);
   });
+
+const createSpriteAlphaTexture = (image: CanvasImageSource & { width?: number; height?: number }) => {
+  const width = Math.max(1, image.width ?? 1);
+  const height = Math.max(1, image.height ?? 1);
+  return createCanvasTexture(width, height, (ctx) => {
+    ctx.drawImage(image, 0, 0, width, height);
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const { data } = imageData;
+    for (let index = 0; index < data.length; index += 4) {
+      const alpha = data[index + 3];
+      data[index] = alpha;
+      data[index + 1] = alpha;
+      data[index + 2] = alpha;
+      data[index + 3] = alpha;
+    }
+    ctx.putImageData(imageData, 0, 0);
+  });
+};
 
 const createConeTexture = () =>
   createCanvasTexture(512, 1024, (ctx, width, height) => {
@@ -1014,16 +1037,46 @@ export function StageCanvas({ scene }: StageCanvasProps) {
           doll.renderOrder = 3;
           prepareFadeMaterial(doll.material);
 
+          const bodyLiftConfig = display.bodyLift;
+          const bodyLiftOpacity = bodyLiftConfig?.opacity ?? DEFAULT_SPRITE_BODY_LIFT.opacity;
           const fillLightConfig = display.fillLight;
-          const fillLight =
-            fillLightConfig && (fillLightConfig.opacity ?? DEFAULT_SPRITE_FILL_LIGHT.opacity) > 0
+          const fillLightOpacity = fillLightConfig?.opacity ?? DEFAULT_SPRITE_FILL_LIGHT.opacity;
+          const spriteAlphaTexture =
+            (bodyLiftConfig && bodyLiftOpacity > 0) || (fillLightConfig && fillLightOpacity > 0) ? createSpriteAlphaTexture(image) : null;
+          const bodyLift =
+            bodyLiftConfig && bodyLiftOpacity > 0 && spriteAlphaTexture
               ? new THREE.Mesh(
                   geometry.clone(),
                   new THREE.MeshBasicMaterial({
-                    map: texture.clone(),
+                    alphaMap: spriteAlphaTexture,
+                    color: bodyLiftConfig.color ?? DEFAULT_SPRITE_BODY_LIFT.color,
+                    transparent: true,
+                    opacity: bodyLiftOpacity,
+                    alphaTest: 0.08,
+                    depthWrite: false,
+                    depthTest: false,
+                    side: THREE.DoubleSide,
+                    toneMapped: false
+                  })
+                )
+              : null;
+          if (bodyLift) {
+            const bodyScale = bodyLiftConfig?.scale ?? DEFAULT_SPRITE_BODY_LIFT.scale;
+            bodyLift.position.z = 0.028;
+            bodyLift.scale.set(bodyScale, bodyScale, 1);
+            bodyLift.renderOrder = 3.25;
+            prepareFadeMaterial(bodyLift.material);
+          }
+
+          const fillLight =
+            fillLightConfig && fillLightOpacity > 0 && spriteAlphaTexture
+              ? new THREE.Mesh(
+                  geometry.clone(),
+                  new THREE.MeshBasicMaterial({
+                    alphaMap: bodyLift ? spriteAlphaTexture.clone() : spriteAlphaTexture,
                     color: fillLightConfig.color ?? DEFAULT_SPRITE_FILL_LIGHT.color,
                     transparent: true,
-                    opacity: fillLightConfig.opacity ?? DEFAULT_SPRITE_FILL_LIGHT.opacity,
+                    opacity: fillLightOpacity,
                     alphaTest: 0.05,
                     depthWrite: false,
                     depthTest: false,
@@ -1064,6 +1117,9 @@ export function StageCanvas({ scene }: StageCanvasProps) {
 
           applySpritePlacement(spriteGroup, display);
           spriteGroup.add(shadow, doll);
+          if (bodyLift) {
+            spriteGroup.add(bodyLift);
+          }
           if (fillLight) {
             spriteGroup.add(fillLight);
           }
