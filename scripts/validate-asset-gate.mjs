@@ -3,7 +3,7 @@ import path from "node:path";
 
 const root = process.cwd();
 const scenesSource = readFileSync(path.join(root, "src/data/scenes.ts"), "utf8");
-const stageCanvasSource = readFileSync(path.join(root, "src/components/StageCanvas.tsx"), "utf8");
+const stageCanvasSource = readFileSync(path.join(root, "src/components/DreamStageCanvas.tsx"), "utf8");
 
 const pendingToyScenes = ["sence1", "sence2", "sence3", "sence4", "sence6"];
 const rejectedPublicAssets = pendingToyScenes.flatMap((sceneId) => [
@@ -14,7 +14,7 @@ const rejectedPublicAssets = pendingToyScenes.flatMap((sceneId) => [
 const failures = [];
 
 if (!stageCanvasSource.includes("display.assetReady === false")) {
-  failures.push("StageCanvas is missing the assetReady false gate before sprite loading");
+  failures.push("DreamStageCanvas is missing the assetReady false gate before sprite loading");
 }
 
 for (const asset of rejectedPublicAssets) {

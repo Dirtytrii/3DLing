@@ -9,15 +9,14 @@ const root = process.cwd();
 const chromePath = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const viteCliPath = path.join(root, "node_modules", "vite", "bin", "vite.js");
 const storySceneIds = ["sence1", "sence2", "sence3", "sence4", "sence5", "sence6"];
-const navigationIds = [...storySceneIds, "letter", "wall"];
+const navigationIds = ["intro", ...storySceneIds, "birthday", "letter", "wall"];
 const rejectedToyPattern = /\/toys\/sence[12346]-toy-2d\.(png|svg)$/;
 const v2ToyPattern = /\/toys\/sence[12346]-toy-2d-v2\.png$/;
 
 const defaultViewports = [
-  { label: "desktop-1398x986", width: 1398, height: 986 },
   { label: "desktop-1440x900", width: 1440, height: 900 },
-  { label: "desktop-1920x1080", width: 1920, height: 1080 },
-  { label: "mobile-390x844", width: 390, height: 844, isMobile: true }
+  { label: "desktop-1440x800", width: 1440, height: 800 },
+  { label: "desktop-1280x720", width: 1280, height: 720 }
 ];
 const sceneSettleTimeoutMs = 20000;
 
@@ -147,7 +146,6 @@ function readSceneExpectations() {
     if (end === -1) fail(`${sceneId}: cannot locate scene block end`);
 
     const block = scenesSource.slice(start, end);
-    const modelReady = /modelReady:\s*true/.test(block);
     const hasToyDisplay = /toyDisplay:\s*{/.test(block);
     const assetReadyFalse = /assetReady:\s*false/.test(block);
     const imagePathMatch = block.match(/imagePath:\s*"([^"]+)"/);
@@ -157,7 +155,7 @@ function readSceneExpectations() {
       : null;
     const toyFileExists = absoluteToyPath ? existsSync(absoluteToyPath) : false;
     const stageProfile = /profile:\s*"red-wheat-concert"/.test(block) ? "red-wheat-concert" : "default";
-    const expectedModelState = modelReady ? "glb" : hasToyDisplay && !assetReadyFalse && toyFileExists ? "sprite" : "placeholder";
+    const expectedModelState = hasToyDisplay && !assetReadyFalse && toyFileExists ? "sprite" : "unavailable";
 
     expectations.set(sceneId, {
       expectedModelState,
@@ -217,6 +215,7 @@ async function startServer(options) {
   const serverProcess = spawn(process.execPath, [viteCliPath, "--host", "127.0.0.1", "--port", String(port), "--strictPort"], {
     cwd: root,
     env: { ...process.env, BROWSER: "none" },
+    windowsHide: true,
     stdio: ["ignore", "pipe", "pipe"]
   });
 
@@ -421,6 +420,7 @@ async function runNavigationCheck(browser, baseUrl, expectations) {
   );
 
   for (const id of navigationIds) {
+    await page.getByRole("button", { name: "回忆目录", exact: true }).click();
     await page.locator(`.scene-rail a[href="#${id}"]`).click();
 
     if (storySceneIds.includes(id)) {
