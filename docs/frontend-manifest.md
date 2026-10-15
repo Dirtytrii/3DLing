@@ -1,5 +1,15 @@
 # Frontend Manifest
 
+## 2026-10-15 当前生日主题入口
+
+当前页面由 `App.tsx` 组合礼物封面、六幕回忆、生日许愿、开信和照片墙。`src/data/scenes.ts` 继续保存原照片/玩偶/回忆文案；`src/data/dreamScenes.ts` 派生新布景和平台接触点；`src/data/gift.ts` 保存生日配置与待填写信件。
+
+实际舞台入口是 `DreamStageCanvas.tsx`：一个正交 Three.js 画布，以原图 cover 比例和 PNG 透明边界定位玩偶，静止/隐藏时停止绘制。旧 `StageCanvas.tsx` 与下文的世界坐标、移动端数据保留为历史实现，当前页面不再读取其位置配置。本轮只支持电脑端。
+
+设计、素材和本轮验收见 `docs/birthday-redesign.md`、`docs/gift-assets.md`。下文是之前版本的数据字段说明，不作为新生日主题构图基线。
+
+## 历史场景数据字段
+
 The gift page is driven by `src/data/scenes.ts`.
 
 Each scene keeps the photo display, toy generation references, stage style, props, and model path together:
