@@ -10,6 +10,7 @@
 | `public/gift/birthday-dream.png` | 1586×992 | `exec-f1cc5b7e-1da8-450f-bd23-40ae23233217` | 微缩蛋糕，保留无火焰的蜡烛和灯芯，火焰由 SVG 叠加 |
 | `public/gift/quiet-dream.png` | 1586×992 | `exec-3f1c8af6-fcb0-45a9-a6d3-f1064e1a7be9` | 暮色天空、云朵和丝带，移除信封、信纸、文字和照片 |
 | `public/gift/paper-texture.png` | 1536×1024 | `exec-087fc9f8-b181-4937-9d27-089999a3fca8` | 细腻暖米色纸纤维，无字、无边缘、无折叠和外部物件 |
+| `public/gift/envelope-front.png` | 1606×979 | `exec-4d1351fa-ed31-44cc-a7da-0fb35fc52161` | 完整纸面折痕、厚度与暖光，用于信封正面，开口由独立剪裁实现 |
 | `public/gift/sence1-dream.png` | 1586×992 | `exec-815979d7-5ef2-4600-84c1-a40af6d3fe1e` | 大理白族院落、白墙青瓦、木雕窗、玉兰 |
 | `public/gift/sence2-dream.png` | 1586×992 | `exec-15f7fa16-273d-4eb7-a0ca-9a9ccc92bb05` | 万圣节校园、南瓜灯、秋叶，温暖无恐怖元素 |
 | `public/gift/sence3-dream.png` | 1585×992 | `exec-27d8bdf4-5714-47f7-b57d-b78916c0a099` | 毕业草坪、花朵、校园和毕业拱门 |
@@ -19,4 +20,4 @@
 
 另外五幕的完整生成提示词和参考图路径保存在 `docs/gift-scene-prompts.json`。前五张先行生产图的要求为上表摘要，完整原始调用保留在会话记录中。
 
-构图规则：左侧文字/照片独立留白，右侧空平台供原玩偶合成；背景无人物、无照片、无界面。渲染使用中心 cover 对齐，场景接触点由 `src/data/dreamScenes.ts` 管理，玩偶透明边界由 `DreamStageCanvas` 实际扫描。场景使用约 16:10 的设计比例，原图尺寸的微小差异小于 1px 的落点偏移。
+构图规则：左侧文字/照片独立留白，右侧空平台供原玩偶合成；背景无人物、无照片、无界面。渲染使用原图实际宽高比进行中心 cover 对齐，场景接触点由 `src/data/dreamScenes.ts` 管理，玩偶透明边界由 `DreamStageCanvas` 实际扫描。
