@@ -16,8 +16,13 @@ const sectionFromHash = () => {
   const id = window.location.hash.slice(1);
   return sections.some((section) => section.id === id) ? id : "intro";
 };
+const isAfterWish = (id: string) => id === "letter" || id === "wall";
 function App() {
   const [active, setActive] = useState(sectionFromHash);
+  const [afterWishVisible, setAfterWishVisible] = useState(() => isAfterWish(sectionFromHash()));
+  const wasAfterWishVisible = useRef(afterWishVisible);
+  const revealAfterWish = useCallback(() => setAfterWishVisible(true), []);
+  const relightWish = useCallback(() => setAfterWishVisible(false), []);
   const [stageId, setStageId] = useState(() => scenes.find((scene) => scene.id === sectionFromHash())?.id ?? scenes[0].id);
   const [ready, setReady] = useState(false);
   const [resources, setResources] = useState<ResourceProgress>({ completed: 0, failed: [], done: false });
@@ -69,6 +74,15 @@ function App() {
     return () => cancelAnimationFrame(frame);
   }, [ready]);
   useLayoutEffect(() => {
+    const newlyVisible = afterWishVisible && !wasAfterWishVisible.current;
+    wasAfterWishVisible.current = afterWishVisible;
+    if (!newlyVisible) return;
+    // Explicit directory/skip navigation may reveal a formerly hidden target.
+    // Align after React exposes it; blowing out the candle keeps scroll intact.
+    const id = sectionFromHash();
+    if (isAfterWish(id)) document.getElementById(id)?.scrollIntoView({ behavior: reducedMotion || !ready ? "instant" : "smooth", block: "start" });
+  }, [afterWishVisible, ready, reducedMotion]);
+  useLayoutEffect(() => {
     // A shorter window changes every preceding full-height section. Keep the
     // current scene aligned; long reading surfaces keep native scroll anchoring.
     const align = () => {
@@ -80,7 +94,10 @@ function App() {
   }, [active]);
   useEffect(() => {
     const synchronize = () => {
-      const id = sectionFromHash(); setActive(id);
+      // During smooth travel, let the viewport select the current section.
+      // Selecting the destination early can start then cancel its animation.
+      const id = sectionFromHash();
+      if (isAfterWish(id)) setAfterWishVisible(true);
       if (scenes.some((scene) => scene.id === id)) setStageId(id);
       document.getElementById(id)?.scrollIntoView({ behavior: reducedMotion || !ready ? "instant" : "smooth", block: "start" });
     };
@@ -107,6 +124,7 @@ function App() {
     return () => observer.disconnect();
   }, [ready]);
   const openLetter = () => {
+    setAfterWishVisible(true);
     setLetterRequest((value) => value + 1);
     window.location.hash = "letter";
     // Scrolling can leave the hash unchanged; assignment alone cannot reopen it.
@@ -118,7 +136,7 @@ function App() {
       <DreamStageCanvas key={attempt} scene={activeScene} active={resources.done && isMemory} prepare={resources.done} onPrepared={onPrepared} onPrepareError={onPrepareError} reducedMotion={reducedMotion} />
       {!ready && <LoadingScreen completed={resources.completed + preparedTextures} total={resourceCount + scenes.length} failed={resources.failed.length + Number(stageError)} leaving={leaving} onRetry={retry} />}
       <div className="gift-content" inert={!ready} aria-busy={!ready}>
-      <GiftNavigation active={active} />
+      <GiftNavigation active={active} onNavigate={(id) => { if (isAfterWish(id)) revealAfterWish(); }} />
       <div className="story-flow">
         <section id="intro" data-section="intro" className={`intro-section gift-section ${active === "intro" ? "is-active" : ""}`}>
           <img className="section-art" src={gift.art.intro} alt="" aria-hidden="true" fetchPriority="high" decoding="async" />
@@ -126,9 +144,11 @@ function App() {
           <a className="scroll-invitation" href="#sence1">向下，开始回忆 <ArrowIcon direction="down" /></a>
         </section>
         {scenes.map((scene, index) => <StorySection key={scene.id} scene={scene} active={active === scene.id} previous={scenes[index - 1]?.id ?? "intro"} next={scenes[index + 1]?.id ?? "birthday"} last={index === scenes.length - 1} />)}
-        <BirthdaySection active={active === "birthday"} reducedMotion={reducedMotion} onOpenLetter={openLetter} />
+        <BirthdaySection active={active === "birthday"} reducedMotion={reducedMotion} onOpenLetter={openLetter} onWishComplete={revealAfterWish} onWishReplay={relightWish} />
+        <div hidden={!afterWishVisible} data-after-wish="">
         <LetterSection active={active === "letter"} request={letterRequest} reducedMotion={reducedMotion} />
         <section className="wall-section quiet-section" id="wall" data-section="wall"><div className="wall-layout"><div className="wall-heading"><h2>照片墙</h2><p>以后继续更新。</p></div><div className="photo-wall">{wallPhotos.map((photo) => <figure key={photo.id}><a href={`#${photo.id}`} aria-label={`回看${photo.title}`}><img src={photo.src} alt={`${photo.title}照片`} loading="lazy" decoding="async" /><figcaption>{photo.title}</figcaption></a></figure>)}</div></div><div className="wall-pager"><a className="text-link" href="#birthday"><ArrowIcon direction="left" />再许个愿</a><a className="text-link" href="#intro">回到开头 <ArrowIcon direction="up" /></a></div></section>
+        </div>
       </div>
       </div>
     </main>

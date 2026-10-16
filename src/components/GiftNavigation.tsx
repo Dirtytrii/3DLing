@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { sections } from "../data/dreamScenes";
 import { ArrowIcon } from "./ArrowIcon";
 
-export function GiftNavigation({ active }: { active: string }) {
+export function GiftNavigation({ active, onNavigate }: { active: string; onNavigate: (id: string) => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const close = () => dialog.current?.close();
 
@@ -21,7 +21,7 @@ export function GiftNavigation({ active }: { active: string }) {
         </div>
         <nav className="scene-rail" aria-label="场景导航">
           {sections.map((section) => (
-            <a key={section.id} href={`#${section.id}`} onClick={close} className={active === section.id ? "active" : ""} aria-current={active === section.id ? "location" : undefined}>
+            <a key={section.id} href={`#${section.id}`} onClick={() => { onNavigate(section.id); close(); }} className={active === section.id ? "active" : ""} aria-current={active === section.id ? "location" : undefined}>
               <span className="directory-number">{section.label}</span>
               <span>{section.title}</span>
               <span className="directory-arrow"><ArrowIcon direction="up-right" /></span>

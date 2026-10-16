@@ -6,8 +6,9 @@ import { WishCelebration } from "./WishCelebration";
 
 type WishState = "lit" | "blowing" | "celebrating" | "revealed";
 
-export function BirthdaySection({ active, reducedMotion, onOpenLetter }: { active: boolean; reducedMotion: boolean; onOpenLetter: () => void }) {
+export function BirthdaySection({ active, reducedMotion, onOpenLetter, onWishComplete, onWishReplay }: { active: boolean; reducedMotion: boolean; onOpenLetter: () => void; onWishComplete: () => void; onWishReplay: () => void }) {
   const [state, setState] = useState<WishState>("lit");
+  const finished = state === "celebrating" || state === "revealed";
   const host = useRef<HTMLElement>(null);
   const [candle, setCandle] = useState({ x: 0, y: 0, artHeight: 0 });
 
@@ -33,7 +34,9 @@ export function BirthdaySection({ active, reducedMotion, onOpenLetter }: { activ
     return () => window.clearTimeout(timer);
   }, [state]);
 
-  const finished = state === "celebrating" || state === "revealed";
+  useEffect(() => {
+    if (finished) onWishComplete();
+  }, [finished, onWishComplete]);
 
   return (
     <section ref={host} className={`birthday-section gift-section wish-${state} ${active ? "is-active" : ""}`} id="birthday" data-section="birthday" data-birthday-state={state}>
@@ -49,7 +52,7 @@ export function BirthdaySection({ active, reducedMotion, onOpenLetter }: { activ
         <p className="gift-subtitle" aria-live="polite">{finished ? gift.wish : "然后，把蜡烛吹灭。"}</p>
         <div className="gift-actions">
           {finished ? <button className="button-primary" type="button" onClick={onOpenLetter}>打开信 <ArrowIcon direction="up-right" /></button> : <button className="button-primary" type="button" disabled={state === "blowing"} onClick={() => setState(reducedMotion ? "revealed" : "blowing")}>{state === "blowing" ? "愿望正在出发…" : "吹灭蜡烛"}</button>}
-          {finished && <button className="text-link replay-wish" type="button" onClick={() => setState("lit")}>再许个愿 <ArrowIcon direction="replay" /></button>}
+          {finished && <button className="text-link replay-wish" type="button" onClick={() => { setState("lit"); onWishReplay(); }}>再许个愿 <ArrowIcon direction="replay" /></button>}
         </div>
       </div>
       <div className="section-pager">
