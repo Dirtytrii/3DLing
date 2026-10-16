@@ -12,6 +12,10 @@
 | `public/gift/paper-texture.png` | 1536×1024 | `exec-087fc9f8-b181-4937-9d27-089999a3fca8` | 细腻暖米色纸纤维，无字、无边缘、无折叠和外部物件 |
 | `public/gift/envelope-front.png` | 1606×979 | `exec-4d1351fa-ed31-44cc-a7da-0fb35fc52161` | 完整纸面折痕、厚度与暖光，用于信封正面，开口由独立剪裁实现 |
 | `public/gift/loading-dream.png` | 1586×992 | `exec-91488421-8bf0-441d-8a50-08c5761032f2` | 2026-10-16 新增加载布景：居中礼物、金色细星轨、下缘暖粉云；全部文字和进度为原生 UI |
+| `public/gift/envelope-stationery.png` | 1667×943，透明 | `exec-ee0ed5c0-3964-4d08-8c7c-dc63d694f339` | 棉纸纤维、金色折线与粉色缎带，封蜡独立；原生剪裁分为翻盖和口袋 |
+| `public/gift/star-wax-seal.png` | 1254×1254，透明 | `exec-3e015971-6874-4122-b8cf-1c28fc9cbae7` | 暖粉封蜡、金星压印；可单独抬起与淡出 |
+| `public/gift/letter-stationery.png` | 1073×1466，透明 | `exec-bcb84d62-d219-4c2c-9ddd-61c95d207b88` | 不规则棉纸边缘与细金装饰，九宫格边框适配任意长信 |
+| `public/gift/letter-cotton-texture.png` | 1254×1254 | `exec-889205c7-e8ee-4740-8f37-00b7f48fae1d` | 与边框同色的细棉纸纹理，正文中心按固定尺寸铺设，避免长信纹理拉伸 |
 | `public/gift/sence1-dream.png` | 1586×992 | `exec-815979d7-5ef2-4600-84c1-a40af6d3fe1e` | 大理白族院落、白墙青瓦、木雕窗、玉兰 |
 | `public/gift/sence2-dream.png` | 1586×992 | `exec-15f7fa16-273d-4eb7-a0ca-9a9ccc92bb05` | 万圣节校园、南瓜灯、秋叶，温暖无恐怖元素 |
 | `public/gift/sence3-dream.png` | 1585×992 | `exec-27d8bdf4-5714-47f7-b57d-b78916c0a099` | 毕业草坪、花朵、校园和毕业拱门 |
@@ -24,3 +28,5 @@
 构图规则：左侧文字/照片独立留白，右侧空平台供原玩偶合成；背景无人物、无照片、无界面。渲染使用原图实际宽高比进行中心 cover 对齐，场景接触点由 `src/data/dreamScenes.ts` 管理，玩偶透明边界由 `DreamStageCanvas` 实际扫描。
 
 2026-10-16 增加 `public/optimized` 网页衍生图，映射见 `src/data/optimizedAssets.json`。12 张布景/纸面及 6 张玩偶从 29.84 MiB 降为 5.81 MiB，原文件完整保留；玩偶逐像素校验 alpha 与所有可见 RGB 值均一致。新加载布景约 81 KiB。字体授权与裁剪来源见 `public/fonts` 及 `docs/loading-and-motion-polish.md`。
+
+同日信件细化再增加以上四张独立素材，相应 WebP 分别为 `envelope-stationery.88527124d3.webp`（556,098 B）、`star-wax-seal.bc4060871f.webp`（248,170 B）、`letter-stationery.2fd5cba6b2.webp`（290,878 B）、`letter-cotton-texture.cfdd4b7060.webp`（125,734 B）。当前优化清单共 22 张，原始 39.26 MiB → 网页 6.98 MiB；原照片和原玩偶未改。详见 `docs/letter-stationery-and-focus.md`。

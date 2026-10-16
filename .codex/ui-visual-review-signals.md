@@ -48,3 +48,19 @@ scope: this project
 recorded at: 2026-10-16
 
 说明：上述接受针对本轮修改前的整体方向；新加载页、字体和动效仍待用户体验。本条仅记录本项目原始反馈，不转化为跨项目偏好。
+
+---
+workflow: ui-implementation-workflow-v2
+status: raw
+task: 2026-10-16 信封、信纸及长信聚焦细化
+page/surface: 现有生日回忆展的信封、信纸与长信阅读
+screenshot or artifact: 用户查看已推送版本后在本会话反馈
+reviewer: 用户
+decision: mixed
+accepted aspects: 用户明确表示现在整体效果还不错
+rejected aspects: 信封与里面的纸仍太简陋，需要更精致；长信需要阅读焦点效果
+reason in reviewer words: “现在的效果还不错，接下来优化一下信封和里面的纸，现在还是有点太简陋了，同时信件正文可能一页放不下，能不能做个随滚动焦点或者随鼠标焦点滚动的特效”
+scope: this project
+recorded at: 2026-10-16
+
+用户在本轮选项中明确选择：“只做聚焦，保留手动滚动（推荐）”。本次新信封、信纸和聚焦效果仍待用户体验；不自动转换为跨项目偏好。

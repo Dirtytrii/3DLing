@@ -20,13 +20,15 @@
 - 场景新背景独立保存，旧资产保留。按全页 cover 裁切计算图片锚点，玩偶真实 alpha 脚底贴合平台；检查全景、脚底和头部裁切。
 - 继续支持 `#sence1`–`#sence6`、`#letter`、`#wall`，新增 `#intro`、`#birthday`。目录使用可访问的原生对话框。
 - 许愿状态：lit → blowing（650ms）→ celebrating（3200ms）→ revealed。离开中间状态结束至 revealed；手动“再许个愿”重置。庆祝时间由初版 1900ms 加长，让熄灭反馈更清楚。
-- 信件状态：sealed → opening（1750ms）→ reading。离开中断的动画回到 sealed；已读信保留 reading。页面刷新重置，可跳过动画；减少动态效果时立即完成。
+- 信件状态：sealed → opening（2100ms，2026-10-16 材质细化后）→ reading。离开中断的动画回到 sealed；已读信保留 reading。页面刷新重置，可跳过动画；减少动态效果时立即完成。
 - 主要桌面验收：1440×900、1440×800、1280×720。Windows Chrome 自动化不能替代 M1 真机 Safari/字体/流畅度验收。
 - 原有未跟踪 `tools/` 是用户现场内容，不纳入提交。
 
 ## 后续接入信件
 
 把用户原文放入 `src/data/gift.ts` 的 `gift.letter.body`。文本以原生文字节点显示，空行分段、保留换行；不解析任意 HTML。添加正文后重新运行本地字体裁剪（见 `docs/loading-and-motion-polish.md`），复核短信/长信、页面高度和底部导航。
+
+2026-10-16 用户选择“只做聚焦，保留手动滚动”。信封、纸张材质与开信过程已细化，多段长信支持滚动/鼠标段落聚焦、文字选择与键盘开关；设计、修正和最新三尺寸验收见 `docs/letter-stationery-and-focus.md`。正文仍留空，本轮自动验收不代替用户视觉确认。
 
 ## 页面、组件与状态
 
