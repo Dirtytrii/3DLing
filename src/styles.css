@@ -91,10 +91,23 @@ button, a { touch-action: manipulation; }
 .wish-blowing .candle-flame { animation: blow-out 650ms ease-in forwards; }
 .birthday-copy { z-index:2; }
 .birthday-copy .gift-subtitle { max-width:440px; min-height:46px; }
-.celebration { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:5; }
-.celebration i { position:absolute; top:-30px; left:var(--x); width:8px; height:15px; background:#ffe1aa; animation: confetti 1.9s calc(var(--i) * 11ms) ease-out both; border-radius:1px; }
-.celebration i:nth-child(3n) { background:#eab3ce; width:10px; height:10px; border-radius:50%; }
-.celebration i:nth-child(3n+1) { background:#d9cbff; }
+.wish-effects { position:absolute; width:0; height:0; z-index:5; pointer-events:none; }
+.candle-smoke { position:absolute; left:0; bottom:-2px; width:calc(var(--wish-unit) * .105); height:calc(var(--wish-unit) * .18); transform:translateX(-50%); overflow:visible; }
+.candle-smoke path { stroke:#f9eadf; stroke-width:2.8; stroke-dasharray:200; stroke-dashoffset:200; opacity:0; filter:blur(.7px); animation:smoke-rise 2400ms ease-out both; }
+.candle-smoke path:nth-child(2) { stroke:#d4c3cf; stroke-width:4; animation-delay:140ms; }
+.candle-smoke path:nth-child(3) { stroke:#fff3da; stroke-width:1.6; animation-delay:280ms; }
+.cake-burst { position:absolute; top:calc(var(--wish-unit) * .235); left:0; }
+.wish-halo { position:absolute; width:calc(var(--wish-unit) * .58); height:calc(var(--wish-unit) * .58); margin:calc(var(--wish-unit) * -.29); border-radius:50%; background:radial-gradient(circle,#fff2c568,#ffd7b128 42%,transparent 70%); animation:wish-bloom 2200ms ease-out both; }
+.wish-ring { position:absolute; width:96px; height:96px; margin:-48px; border:1px solid #ffe6b7; border-radius:50%; box-shadow:0 0 18px #ffe1b56b,inset 0 0 15px #ffe1b526; animation:wish-ring 1700ms ease-out both; }
+.wish-particle { position:absolute; top:0; left:0; display:block; width:var(--size); height:var(--size); margin:calc(var(--size) * -.5); opacity:0; animation:wish-scatter var(--duration) var(--delay) cubic-bezier(.16,.58,.42,1) both; will-change:transform,opacity; }
+.wish-particle.is-star svg { display:block; width:100%; height:100%; fill:#ffe6a7; stroke:#fff7d6; stroke-width:1; filter:drop-shadow(0 0 4px #e7ac66) drop-shadow(0 1px 2px #6d3b68); }
+.wish-particle.is-star:nth-child(3n) svg { fill:#fff9dd; }
+.wish-particle.is-confetti { height:calc(var(--size) * 1.8); border-radius:2px; background:#f8c0d0; box-shadow:0 1px 3px #673b6455; }
+.wish-particle.is-confetti:nth-child(3n) { background:#ffe8aa; }
+.wish-particle.is-confetti:nth-child(3n+1) { background:#e1ceff; }
+.wish-celebrating .birthday-copy h2 { animation:birthday-greeting 900ms var(--ease-out) both; }
+.wish-celebrating .birthday-copy .gift-subtitle { animation:birthday-line 850ms 180ms var(--ease-out) both; }
+.wish-celebrating .birthday-copy .gift-actions { animation:birthday-line 700ms 360ms var(--ease-out) both; }
 .quiet-section { position:relative; min-height:100svh; isolation:isolate; background-color:var(--color-background); background-image:url('/gift/quiet-dream.png'); background-position:center top; background-size:100% auto; background-repeat:no-repeat; }
 .letter-section { padding:110px var(--page-pad) 40px; }
 .letter-stage { position:relative; max-width:1000px; min-height:calc(100svh - 240px); margin:0 auto; perspective:1400px; }
@@ -155,7 +168,12 @@ html:has(.directory[open]) { overflow:hidden; }
 @keyframes photo-swap { from { opacity:.4; transform:translateY(5px); } to { opacity:1; transform:none; } }
 @keyframes flame-flicker { from { transform:rotate(-2deg) scaleX(.94); } to { transform:rotate(2deg) scaleY(1.03); } }
 @keyframes blow-out { 30% { transform:translate(-50%,-100%) skewX(22deg) scale(.8,1.1); opacity:1; } 100% { transform:translate(-30%,-100%) skewX(40deg) scale(.05,.1); opacity:0; } }
-@keyframes confetti { from { transform:translate3d(0,-30px,0) rotate(0); opacity:0; } 12% { opacity:1; } to { transform:translate3d(var(--drift),85vh,0) rotate(420deg); opacity:0; } }
+@keyframes smoke-rise { 0% { opacity:0; stroke-dashoffset:200; transform:translateY(8px); } 18% { opacity:.85; } 65% { opacity:.6; stroke-dashoffset:0; } 100% { opacity:0; stroke-dashoffset:-40; transform:translateY(-22px) scaleX(1.3); } }
+@keyframes wish-bloom { 0% { opacity:0; transform:scale(.3); } 22% { opacity:1; } 100% { opacity:0; transform:scale(1.35); } }
+@keyframes wish-ring { 0% { opacity:0; transform:scale(.25); } 15% { opacity:.8; } 100% { opacity:0; transform:scale(5.5); } }
+@keyframes wish-scatter { 0% { opacity:0; transform:translate3d(0,0,0) rotate(0) scale(.15); } 12% { opacity:1; } 48% { opacity:1; transform:translate3d(var(--apex-x),var(--apex-y),0) rotate(var(--turn)) scale(1.12); } 76% { opacity:1; } 100% { opacity:0; transform:translate3d(var(--dx),var(--dy),0) rotate(var(--turn)) scale(.6); } }
+@keyframes birthday-greeting { from { opacity:0; transform:translateY(22px) scale(.97); text-shadow:0 0 0 transparent; } 70% { text-shadow:0 0 24px #ffe3a260; } to { opacity:1; transform:none; text-shadow:0 0 0 transparent; } }
+@keyframes birthday-line { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
 @keyframes flap-open { to { transform:rotateX(-180deg); z-index:1; } }
 @keyframes paper-extract { 0%,28% { transform:translateY(0); opacity:1; } 65% { transform:translateY(-200px) scale(1.15); opacity:1; } 100% { transform:translateY(-260px) scale(1.6); opacity:0; } }
 @keyframes envelope-retreat { to { transform:translate(-50%,100px) scale(.9); opacity:0; } }
