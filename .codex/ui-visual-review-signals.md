@@ -32,3 +32,19 @@ scope: this project
 recorded at: 2026-10-15
 
 说明：整体 UI 已获得本次明确肯定；新庆祝动效仍待用户查看。本条仅作本项目原始反馈，不转化为跨项目审美偏好。
+
+---
+workflow: ui-implementation-workflow-v2
+status: raw
+task: 2026-10-16 完整资源加载与全局字体动效细化
+page/surface: 已部署生日回忆展，加载页与整段滚动体验
+screenshot or artifact: 用户本轮查看现有页面后的反馈；具体部署记录见会话
+reviewer: 用户
+decision: mixed
+accepted aspects: 用户明确表示整体没有问题，继续沿用现有梦幻生日视觉
+rejected aspects: 进入主页后下滑时后续资源可能未完成；加载动画、全局动效与字体还需要细化
+reason in reviewer words: “我看了下整体是没问题的，但是我进入了主页以后往下滑动的时候有可能资源还没加载完，加载动画能不能做精美一点然后保证加载完所有的资源再进入？同时整体动效 字体等设计还是不够丝滑，再细化设计一遍”
+scope: this project
+recorded at: 2026-10-16
+
+说明：上述接受针对本轮修改前的整体方向；新加载页、字体和动效仍待用户体验。本条仅记录本项目原始反馈，不转化为跨项目偏好。

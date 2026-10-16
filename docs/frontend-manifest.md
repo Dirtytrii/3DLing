@@ -8,7 +8,17 @@
 
 设计、素材和本轮验收见 `docs/birthday-redesign.md`、`docs/gift-assets.md`。下文是之前版本的数据字段说明，不作为新生日主题构图基线。
 
-## 历史场景数据字段
+## 2026-10-16 当前加载与字体机制
+
+用户要求完整准备后再进入，覆盖下文历史的“只等待首屏”策略。当前 `src/lib/resources.ts` 收集整段体验实际使用的 36 张图片（全部相册照片也包含在内）与 2 个本地字体，六路并发、去重加载，图片等待 `decode()`；随后 `DreamStageCanvas` 上传六幕纹理并预编译共用材质。全部成功后加载页淡出、解除滚动和交互锁；失败停留并重试，超时不会被当作完成。
+
+生产路径通过 `src/data/optimizedAssets.json` 指向内容哈希 WebP：布景质量 90、玩偶无损，照片保留原 JPG。纸张/信封/安静背景使用与预载清单相同的 CSS 变量路径。本地 Noto Serif SC / Sans SC 字体在闸门内加载，裁剪与授权见 `docs/loading-and-motion-polish.md`。原 `scenes.ts` 和原 PNG 不变。
+
+背景和玩偶过渡统一为 800ms；背景保留不透明旧层，逐层叠入新图，快速返回仍保留底层；静止后清理。文字按标题、次标题、正文、照片顺序错峰进入，系统减少动态效果时立即收尾并停止持续动画。
+
+新增验收：`npm run qa:resources` 覆盖最后一张图库图片、字体阻塞、失败重试、真实锁屏、全图库缓存、快速滚动和中断切幕；原 `qa:gift` / `qa:scenes` 继续覆盖桌面交互与落点。
+
+## 历史场景数据字段（以下加载策略已被上文替代）
 
 The gift page is driven by `src/data/scenes.ts`.
 
