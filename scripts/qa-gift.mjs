@@ -8,6 +8,7 @@ import assert from "node:assert/strict";
 
 const prototype = process.argv.includes("--prototype");
 const checksOnly = process.argv.includes("--checks-only");
+const wishOnly = process.argv.includes("--wish-only");
 const surfaceOnly = process.argv.find((arg) => arg.startsWith("--surface="))?.slice(10);
 if (surfaceOnly && !["intro", "birthday", "letter", "wall"].includes(surfaceOnly)) throw new Error(`Unknown surface: ${surfaceOnly}`);
 const outDir = path.join(tmpdir(), `3dling-gift-${checksOnly ? "checks" : prototype ? "prototype" : "qa"}-${Date.now()}`);
@@ -32,7 +33,7 @@ const errors = [];
 const measurements = [];
 const sizes = [{ width: 1440, height: 900 }, { width: 1440, height: 800 }, { width: 1280, height: 720 }];
 const sceneIds = prototype ? ["sence5"] : ["sence1", "sence2", "sence3", "sence4", "sence5", "sence6"];
-const sections = surfaceOnly ? [surfaceOnly] : checksOnly ? [] : ["intro", ...sceneIds, "birthday", "letter", "wall"];
+const sections = surfaceOnly ? [surfaceOnly] : checksOnly || wishOnly ? [] : ["intro", ...sceneIds, "birthday", "letter", "wall"];
 
 async function settle(page, id) {
   await page.waitForFunction((expected) => {
@@ -40,7 +41,15 @@ async function settle(page, id) {
     const target = document.getElementById(expected);
     const background = document.querySelector(".scene-background-layer.is-active");
     return app?.dataset.appReady === "true" && app.dataset.activeSection === expected && Math.abs(target.getBoundingClientRect().top) < 2 && (!expected.startsWith("sence") || background?.dataset.backgroundScene === expected);
-  }, id, { timeout: 20000 });
+  }, id, { timeout: 20000 }).catch(async (error) => {
+    console.error("Unsettled page", await page.evaluate((expected) => ({
+      url: location.href,
+      ready: document.querySelector(".app-shell")?.dataset.appReady,
+      active: document.querySelector(".app-shell")?.dataset.activeSection,
+      targetTop: document.getElementById(expected)?.getBoundingClientRect().top
+    }), id));
+    throw error;
+  });
   await page.waitForFunction(() => [...document.querySelectorAll("img")].filter((image) => {
     const rect = image.getBoundingClientRect(); return rect.top < innerHeight && rect.bottom > 0;
   }).every((image) => image.complete && image.naturalWidth > 0), null, { timeout: 20000 });
@@ -111,12 +120,49 @@ try {
     if (surfaceOnly) { await context.close(); continue; }
     await page.goto(`${url}/#birthday`); await settle(page, "birthday");
     await page.getByRole("button", { name: "吹灭蜡烛", exact: true }).click();
+    await page.waitForFunction(() => document.querySelector("#birthday").dataset.birthdayState === "celebrating");
+    assert.equal(await page.locator(".candle-flame").count(), 0);
+    assert.equal(await page.locator(".wish-particle").count(), 64);
+    assert.equal(await page.locator(".candle-smoke").count(), 1);
+    await page.waitForTimeout(700);
+    const celebration = await page.locator(".wish-effects").evaluate((node) => {
+      const bounds = node.getBoundingClientRect();
+      const stars = [...node.querySelectorAll(".is-star")].filter((star) => {
+        const rect = star.getBoundingClientRect();
+        return Number(getComputedStyle(star).opacity) > .5 && rect.right > 0 && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight;
+      });
+      return { x: bounds.x, y: bounds.y, stars: stars.length };
+    });
+    assert.ok(celebration.x > size.width * .6 && celebration.y < size.height * .35, "Celebration tracks the candle anchor");
+    assert.ok(celebration.stars >= 20, "Visible star burst around cake");
+    await page.screenshot({ path: path.join(outDir, `${size.width}x${size.height}-wish-celebration.png`) });
     await page.waitForFunction(() => document.querySelector("#birthday").dataset.birthdayState === "revealed");
     assert.equal(await page.locator(".candle-flame").count(), 0);
+    assert.equal(await page.locator(".wish-effects").count(), 0, "One-shot effects clean up after celebration");
     assert.ok(page.url().endsWith("#birthday"), "Greeting waits for the reader to choose open letter");
     await page.screenshot({ path: path.join(outDir, `${size.width}x${size.height}-wish-revealed.png`) });
+    if (wishOnly && size.height === 900) {
+      await page.getByRole("button", { name: "再许个愿", exact: true }).click();
+      assert.equal(await page.locator(".candle-flame").count(), 1);
+      await page.getByRole("button", { name: "吹灭蜡烛", exact: true }).click();
+      await page.waitForFunction(() => document.querySelector("#birthday").dataset.birthdayState === "celebrating");
+      await page.getByRole("button", { name: "再许个愿", exact: true }).click();
+      assert.equal(await page.locator(".wish-effects").count(), 0, "Replay cancels the previous burst");
+      assert.equal(await page.locator(".candle-flame").count(), 1);
+      await page.getByRole("button", { name: "吹灭蜡烛", exact: true }).click();
+      await page.waitForFunction(() => document.querySelector("#birthday").dataset.birthdayState === "celebrating");
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.waitForFunction(() => document.querySelector("#birthday").dataset.birthdayState === "revealed");
+      assert.equal(await page.locator(".wish-effects").count(), 0, "Changing reduced motion stops the celebration immediately");
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await page.getByRole("button", { name: "再许个愿", exact: true }).click();
+      await page.getByRole("button", { name: "吹灭蜡烛", exact: true }).click();
+      await page.waitForFunction(() => document.querySelector("#birthday").dataset.birthdayState === "celebrating");
+      console.log("PASS replay during celebration and live reduced-motion change");
+    }
     await page.locator("#birthday").getByRole("button", { name: /打开信/ }).click();
     await page.waitForFunction(() => document.querySelector("#letter").dataset.letterState === "opening");
+    assert.equal(await page.locator(".wish-effects").count(), 0, "Leaving for the letter clears particles");
     await page.waitForTimeout(500);
     await page.screenshot({ path: path.join(outDir, `${size.width}x${size.height}-letter-opening.png`) });
     await page.waitForFunction(() => document.querySelector("#letter").dataset.letterState === "reading");
@@ -125,7 +171,7 @@ try {
     await page.keyboard.press("Escape"); assert.equal(await page.getByRole("dialog").isVisible(), false);
     await page.getByRole("button", { name: "回忆目录", exact: true }).click();
     await page.locator('.directory a[href="#sence5"]').click(); await settle(page, "sence5");
-    if (size.height === 900) {
+    if (size.height === 900 && !wishOnly) {
       // Interrupt transitions repeatedly; the final selection must win.
       for (const id of ["sence2", "sence6", "sence1", "sence5"]) {
         await page.evaluate((next) => { location.hash = next; }, id);
@@ -173,6 +219,7 @@ try {
   console.log("PASS reduced motion, keyboard activation and reopening letter with unchanged hash");
   await reduced.close();
 
+  if (!wishOnly) {
   // Exercise a real long plaintext letter without changing the user's empty slot.
   const longContext = await browser.newContext({ viewport: sizes[2], reducedMotion: "reduce" });
   const longPage = await longContext.newPage();
@@ -219,6 +266,7 @@ try {
   await recoveryPage.screenshot({ path: path.join(outDir, "1280x720-sence2-resize.png") });
   console.log("PASS missing toy recovery, stopped idle RAF and same-page resize");
   await resilience.close();
+  }
   }
   assert.deepEqual(errors, [], `Browser errors: ${errors.join("; ")}`);
   writeFileSync(path.join(outDir, "measurements.json"), JSON.stringify({ measurements, errors }, null, 2));
