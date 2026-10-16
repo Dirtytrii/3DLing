@@ -19,7 +19,7 @@
 - 先通过海口、生日、开信样板，再扩展其他五幕；最多两轮修正后仍未通过，则评估交接截图所示 Grok Bot 客户端。Grok CLI 是另一个入口，其认证状态不代表 Grok Bot 客户端状态。
 - 场景新背景独立保存，旧资产保留。按全页 cover 裁切计算图片锚点，玩偶真实 alpha 脚底贴合平台；检查全景、脚底和头部裁切。
 - 继续支持 `#sence1`–`#sence6`、`#letter`、`#wall`，新增 `#intro`、`#birthday`。目录使用可访问的原生对话框。
-- 许愿状态：lit → blowing（650ms）→ celebrating（1900ms）→ revealed。离开中间状态结束至 revealed；手动“再许个愿”重置。
+- 许愿状态：lit → blowing（650ms）→ celebrating（3200ms）→ revealed。离开中间状态结束至 revealed；手动“再许个愿”重置。庆祝时间由初版 1900ms 加长，让熄灭反馈更清楚。
 - 信件状态：sealed → opening（1750ms）→ reading。离开中断的动画回到 sealed；已读信保留 reading。页面刷新重置，可跳过动画；减少动态效果时立即完成。
 - 主要桌面验收：1440×900、1440×800、1280×720。Windows Chrome 自动化不能替代 M1 真机 Safari/字体/流畅度验收。
 - 原有未跟踪 `tools/` 是用户现场内容，不纳入提交。
@@ -80,3 +80,18 @@ IAB 在本机访问本地页和公开页均超时，故使用已安装的 Playwr
 - 已加载并使用：agent-role-orchestrator、ui-implementation-workflow、frontend-app-builder、imagegen、browser-automation-router、playwright、frontend-testing-debugging、react-best-practices。
 - 误召/无效加载：前期模型讨论读取过 openai-docs，不作为本轮界面设计或实现依据。
 - 角色闭环：用户直接授权当前会话实施，结果在本会话交付；未向旧角色窗口发送消息，未新增子代理。
+
+## 许愿动效加强
+
+用户明确满意已实现的整体 UI，同时指出吹灭后的动效太不显眼。本次只加强生日页的动作反馈，沿用现有布局、布景和色彩。
+
+- 初版 28 片细小彩纸从屏幕顶部落下，改为蛋糕附近发出的 28 颗金色星星与 36 片奶油粉/浅紫彩纸，配合短暂暖光和扩散光环。
+- 熄灭后从实际灯芯位置升起烟雾；烟雾、粒子与烛火共用背景 cover 坐标，随窗口尺寸保持对齐。
+- “生日快乐”、祝福和按钮分次显现。庆祝持续 3.2 秒，结束后移除动效节点；原生 CSS/SVG 实现，无新增依赖或渲染循环。
+- 重播会清除上一轮粒子；离开生日页会结束动效；系统“减少动态效果”启用或在播放中切换时立即展示祝福。
+
+验收：`npm run qa:gift -- --wish-only` 在 1440×900、1440×800、1280×720 通过。验证烛火消失、64 个粒子、至少 20 颗星星在采样时清楚可见、灯芯锚点、播放后清理，以及开信/目录衔接。额外验证播放中重播、动态切换减少动态效果、键盘激活和同锚点再次开信。控制台和网络错误为零。
+
+本轮 IAB 起初停在断线后的内部错误页，地址规则拒绝自动控制；由用户手动恢复正常 HTTP 页面后继续检查。IAB 的画面仍出现与 DOM 状态不同步的延迟，因此动态关键帧采用项目既有 Playwright + Chrome 的独立测试窗口采样，不以旧画面作为通过证据。
+
+最新动效截图：`C:\Users\12156\AppData\Local\Temp\3dling-gift-qa-1792079975242\*-wish-celebration.png`；三尺寸精选已复制到前述 `birthday-review` 交付目录。M1 Safari 真机仍未验证。
