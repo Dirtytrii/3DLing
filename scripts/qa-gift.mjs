@@ -121,8 +121,21 @@ try {
 
     if (surfaceOnly) { await context.close(); continue; }
     await page.goto(`${url}/#birthday`); await settle(page, "birthday");
+    const boundary = await page.locator("#birthday").evaluate((node) => node.getBoundingClientRect().top + scrollY);
+    assert.equal(await page.locator("[data-after-wish]").evaluate((node) => node.hidden), true);
+    assert.ok(Math.abs(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight) - boundary) < 2, "Native page ends at the lit candle, including scrollbar dragging");
+    await page.mouse.wheel(0, 12000); await page.waitForTimeout(200);
+    for (const key of ["PageDown", "Space", "End", "Control+End"]) await page.keyboard.press(key);
+    await page.waitForTimeout(250);
+    assert.ok(Math.abs(await page.evaluate(() => scrollY) - boundary) < 2, "Wheel and keyboard cannot scroll past an unblown candle");
+    await page.mouse.wheel(0, -size.height); await page.waitForFunction((y) => scrollY < y - 100, boundary);
+    await page.mouse.wheel(0, size.height * 20); await settle(page, "birthday");
+    assert.equal(await page.locator("#birthday").getAttribute("data-birthday-state"), "lit", "Fast scrolling into the birthday still requires blowing out the candle");
+    await page.screenshot({ path: path.join(outDir, `${size.width}x${size.height}-wish-scroll-locked.png`) });
     await page.getByRole("button", { name: "吹灭蜡烛", exact: true }).click();
     await page.waitForFunction(() => document.querySelector("#birthday").dataset.birthdayState === "celebrating");
+    await page.waitForFunction(() => !document.querySelector("[data-after-wish]").hidden);
+    assert.ok(Math.abs(await page.evaluate(() => scrollY) - boundary) < 2, "Unlocking after the flame goes out does not move the page");
     assert.equal(await page.locator(".candle-flame").count(), 0);
     assert.equal(await page.locator(".wish-particle").count(), 64);
     assert.equal(await page.locator(".candle-smoke").count(), 1);
@@ -143,8 +156,12 @@ try {
     assert.equal(await page.locator(".wish-effects").count(), 0, "One-shot effects clean up after celebration");
     assert.ok(page.url().endsWith("#birthday"), "Greeting waits for the reader to choose open letter");
     await page.screenshot({ path: path.join(outDir, `${size.width}x${size.height}-wish-revealed.png`) });
+    await page.mouse.wheel(0, size.height); await page.waitForFunction((y) => scrollY > y + 100, boundary);
+    await page.locator("#birthday").evaluate((node) => node.scrollIntoView({ behavior: "instant" })); await settle(page, "birthday");
+    console.log(`PASS ${size.width}x${size.height} native wish boundary: wheel/keyboard/fast entry, upward review and unlock without jumping`);
     if (wishOnly && size.height === 900) {
       await page.getByRole("button", { name: "再许个愿", exact: true }).click();
+      assert.equal(await page.locator("[data-after-wish]").evaluate((node) => node.hidden), true, "Relighting the candle restores the downward boundary");
       assert.equal(await page.locator(".candle-flame").count(), 1);
       await page.getByRole("button", { name: "吹灭蜡烛", exact: true }).click();
       await page.waitForFunction(() => document.querySelector("#birthday").dataset.birthdayState === "celebrating");
@@ -167,7 +184,11 @@ try {
     assert.equal(await page.locator(".wish-effects").count(), 0, "Leaving for the letter clears particles");
     await page.waitForTimeout(500);
     await page.screenshot({ path: path.join(outDir, `${size.width}x${size.height}-letter-opening.png`) });
-    await page.waitForFunction(() => document.querySelector("#letter").dataset.letterState === "reading");
+    await page.waitForFunction(() => document.querySelector("#letter").dataset.letterState === "reading", null, { timeout: 8000 }).catch(async (error) => {
+      console.error("Opening interrupted", await page.evaluate(() => ({ active: document.querySelector(".app-shell").dataset.activeSection, hash: location.hash, state: document.querySelector("#letter").dataset.letterState, birthdayTop: document.getElementById("birthday").getBoundingClientRect().top, letterTop: document.getElementById("letter").getBoundingClientRect().top, hidden: document.querySelector("[data-after-wish]").hidden })));
+      await page.screenshot({ path: path.join(outDir, "opening-interrupted.png") });
+      throw error;
+    });
     await page.getByRole("button", { name: "回忆目录", exact: true }).click();
     assert.ok(await page.getByRole("dialog").isVisible());
     await page.keyboard.press("Escape"); assert.equal(await page.getByRole("dialog").isVisible(), false);
@@ -220,6 +241,22 @@ try {
   await page.locator("#birthday").getByRole("button", { name: /打开信/ }).click();
   await settle(page, "letter");
   console.log("PASS reduced motion, keyboard activation and reopening letter with unchanged hash");
+  await page.locator("#birthday").evaluate((node) => node.scrollIntoView({ behavior: "instant" })); await settle(page, "birthday");
+  await page.getByRole("button", { name: "再许个愿", exact: true }).click();
+  assert.equal(await page.locator("[data-after-wish]").evaluate((node) => node.hidden), true);
+  await page.getByRole("button", { name: "回忆目录", exact: true }).click();
+  await page.locator('.directory a[href="#letter"]').click(); await settle(page, "letter");
+  assert.equal(await page.locator("#letter").getAttribute("data-letter-state"), "reading", "Same-hash directory access after relighting preserves the existing letter");
+  const skip = await reduced.newPage();
+  await skip.goto(`${url}/#birthday`); await settle(skip, "birthday");
+  await skip.getByRole("button", { name: "跳过，读信", exact: true }).click();
+  await settle(skip, "letter");
+  assert.equal(await skip.locator("#letter").getAttribute("data-letter-state"), "reading");
+  await skip.goto(`${url}/#birthday`); await settle(skip, "birthday");
+  await skip.getByRole("button", { name: "回忆目录", exact: true }).click();
+  await skip.locator('.directory a[href="#wall"]').click(); await settle(skip, "wall");
+  assert.equal(await skip.locator("#birthday").getAttribute("data-birthday-state"), "lit", "Explicit directory navigation is still available before blowing out the candle");
+  console.log("PASS explicit skip and directory reveal hidden destinations after layout");
   await reduced.close();
 
   if (!wishOnly) {
