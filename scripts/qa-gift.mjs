@@ -241,7 +241,10 @@ try {
   assert.ok((await longPage.locator(".letter-paper").boundingBox()).height > sizes[2].height * 3);
   assert.equal(await longPage.locator(".letter-body").evaluate((node) => getComputedStyle(node).overflowY), "visible");
   await longPage.locator("#letter .letter-pager").scrollIntoViewIfNeeded();
-  await longPage.waitForTimeout(300);
+  await longPage.waitForFunction(() => {
+    const bounds = document.querySelector("#letter .letter-pager").getBoundingClientRect();
+    return bounds.top >= 0 && bounds.bottom <= innerHeight && document.querySelector(".app-shell").dataset.activeSection === "letter";
+  });
   assert.equal(await longPage.locator(".app-shell").getAttribute("data-active-section"), "letter");
   assert.ok(await longPage.locator("#letter a[href='#wall']").isVisible());
   await longPage.screenshot({ path: path.join(outDir, "1280x720-letter-long-fixture.png") });

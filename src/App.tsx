@@ -89,10 +89,18 @@ function App() {
   }, [reducedMotion, ready]);
   useEffect(() => {
     if (!ready) return;
+    const intersecting = new Set<Element>();
     const observer = new IntersectionObserver((entries) => {
-      const visible = entries.find((entry) => entry.isIntersecting);
+      // Entries are changes, not a complete visibility snapshot. A long letter
+      // may stay intersecting after the preceding section leaves the band.
+      entries.forEach((entry) => entry.isIntersecting ? intersecting.add(entry.target) : intersecting.delete(entry.target));
+      const anchor = innerHeight * .375;
+      const visible = [...intersecting].find((section) => {
+        const bounds = section.getBoundingClientRect();
+        return bounds.top <= anchor && bounds.bottom > anchor;
+      }) ?? [...intersecting][0];
       if (!visible) return;
-      const id = visible.target.id; setActive(id);
+      const id = visible.id; setActive(id);
       if (scenes.some((scene) => scene.id === id)) setStageId(id);
     }, { rootMargin: "-30% 0px -55% 0px", threshold: 0 });
     document.querySelectorAll<HTMLElement>("[data-section]").forEach((section) => observer.observe(section));
