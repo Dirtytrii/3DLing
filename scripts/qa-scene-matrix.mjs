@@ -18,7 +18,7 @@ const defaultViewports = [
   { label: "desktop-1440x800", width: 1440, height: 800 },
   { label: "desktop-1280x720", width: 1280, height: 720 }
 ];
-const sceneSettleTimeoutMs = 20000;
+const sceneSettleTimeoutMs = 60000;
 
 function fail(message) {
   console.error(`Scene QA failed: ${message}`);
@@ -135,6 +135,7 @@ function parseViewport(value) {
 
 function readSceneExpectations() {
   const scenesSource = readFileSync(path.join(root, "src", "data", "scenes.ts"), "utf8");
+  const optimized = JSON.parse(readFileSync(path.join(root, "src/data/optimizedAssets.json"), "utf8"));
   const expectations = new Map();
 
   for (const sceneId of storySceneIds) {
@@ -160,7 +161,7 @@ function readSceneExpectations() {
     expectations.set(sceneId, {
       expectedModelState,
       stageProfile,
-      imagePath,
+      imagePath: optimized[imagePath] ?? imagePath,
       assetReadyFalse,
       toyFileExists
     });

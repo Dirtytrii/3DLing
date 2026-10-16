@@ -12,6 +12,7 @@
     "promote:toys:v2": "node scripts/promote-toy-assets-v2.mjs",
     "qa:scenes": "node scripts/qa-scene-matrix.mjs",
     "qa:gift": "node scripts/qa-gift.mjs",
+    "qa:resources": "node scripts/qa-resources.mjs",
     "validate:asset-gate": "node scripts/validate-asset-gate.mjs",
     "validate:toys": "node scripts/validate-toy-assets.mjs",
     "preview": "vite preview --host 127.0.0.1"

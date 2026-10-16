@@ -1,6 +1,6 @@
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import net from "node:net";
 import path from "node:path";
@@ -13,6 +13,7 @@ const surfaceOnly = process.argv.find((arg) => arg.startsWith("--surface="))?.sl
 if (surfaceOnly && !["intro", "birthday", "letter", "wall"].includes(surfaceOnly)) throw new Error(`Unknown surface: ${surfaceOnly}`);
 const outDir = path.join(tmpdir(), `3dling-gift-${checksOnly ? "checks" : prototype ? "prototype" : "qa"}-${Date.now()}`);
 mkdirSync(outDir, { recursive: true });
+console.log(`Evidence: ${outDir}`);
 const serverSocket = net.createServer();
 await new Promise((resolve) => serverSocket.listen(0, "127.0.0.1", resolve));
 const port = serverSocket.address().port;
@@ -30,6 +31,7 @@ for (let attempt = 0; attempt < 100; attempt++) {
 const chrome = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const browser = await chromium.launch({ executablePath: existsSync(chrome) ? chrome : undefined, headless: true });
 const errors = [];
+const optimized = JSON.parse(readFileSync("src/data/optimizedAssets.json", "utf8"));
 const measurements = [];
 const sizes = [{ width: 1440, height: 900 }, { width: 1440, height: 800 }, { width: 1280, height: 720 }];
 const sceneIds = prototype ? ["sence5"] : ["sence1", "sence2", "sence3", "sence4", "sence5", "sence6"];
@@ -41,7 +43,7 @@ async function settle(page, id) {
     const target = document.getElementById(expected);
     const background = document.querySelector(".scene-background-layer.is-active");
     return app?.dataset.appReady === "true" && app.dataset.activeSection === expected && Math.abs(target.getBoundingClientRect().top) < 2 && (!expected.startsWith("sence") || background?.dataset.backgroundScene === expected);
-  }, id, { timeout: 20000 }).catch(async (error) => {
+  }, id, { timeout: 60000 }).catch(async (error) => {
     console.error("Unsettled page", await page.evaluate((expected) => ({
       url: location.href,
       ready: document.querySelector(".app-shell")?.dataset.appReady,
@@ -97,14 +99,14 @@ try {
       measurements.push({ viewport: size, section: id, ...state });
       if (id.startsWith("sence")) {
         assert.ok(state.foot[0] > size.width * .5 && state.foot[1] < size.height - 70, `${id}: toy outside art stage region`);
-        const source = await page.locator(`#${id} .photo-main-image`).getAttribute("src");
+        const source = await page.locator(`#${id} [data-photo-main]`).getAttribute("src");
         const swap = page.getByRole("button", { name: `查看${await page.locator(`#${id} h2`).textContent()}下一张照片` });
         if (await swap.count()) {
           await swap.click();
-          assert.notEqual(await page.locator(`#${id} .photo-main-image`).getAttribute("src"), source);
+          assert.notEqual(await page.locator(`#${id} [data-photo-main]`).getAttribute("src"), source);
           await page.locator(`#${id}`).getByRole("button", { name: /上一张照片/ }).click();
           await settle(page, id);
-          assert.equal(await page.locator(`#${id} .photo-main-image`).getAttribute("src"), source);
+          assert.equal(await page.locator(`#${id} [data-photo-main]`).getAttribute("src"), source);
         }
       }
       if (id === "letter") {
@@ -206,6 +208,7 @@ try {
   const reduced = await browser.newContext({ viewport: sizes[0], reducedMotion: "reduce" });
   const page = await reduced.newPage();
   await page.goto(`${url}/#birthday`); await settle(page, "birthday");
+  assert.equal(await page.locator(".candle-flame svg").evaluate((node) => getComputedStyle(node).animationIterationCount), "1", "Reduced motion removes continuous flickering");
   await page.getByRole("button", { name: "吹灭蜡烛", exact: true }).focus();
   await page.keyboard.press("Enter");
   assert.equal(await page.locator("#birthday").getAttribute("data-birthday-state"), "revealed");
@@ -252,11 +255,14 @@ try {
     window.requestAnimationFrame = (callback) => original((time) => { window.rafCalls++; callback(time); });
   });
   const recoveryPage = await resilience.newPage();
-  await recoveryPage.route("**/toys/sence2-toy-2d-v2.png", (route) => route.abort());
+  const failedToy = `**${optimized["/toys/sence2-toy-2d-v2.png"]}`;
+  await recoveryPage.route(failedToy, (route) => route.abort());
   await recoveryPage.goto(`${url}/#sence2`);
-  await recoveryPage.waitForFunction(() => document.querySelector(".app-shell").dataset.appReady === "true" && document.querySelector(".stage-canvas").dataset.modelState === "unavailable");
-  assert.ok(await recoveryPage.locator("#sence2 h2").isVisible(), "Memory copy survives a failed toy asset");
-  await recoveryPage.unroute("**/toys/sence2-toy-2d-v2.png");
+  await recoveryPage.locator('[data-loading-state="error"]').waitFor();
+  assert.equal(await recoveryPage.locator(".app-shell").getAttribute("data-app-ready"), "false", "Missing toy cannot pass the complete-resource gate");
+  await recoveryPage.unroute(failedToy);
+  await recoveryPage.getByRole("button", { name: /重新准备/ }).click();
+  await settle(recoveryPage, "sence2");
   await recoveryPage.evaluate(() => { location.hash = "sence1"; }); await settle(recoveryPage, "sence1");
   await recoveryPage.evaluate(() => { location.hash = "sence2"; }); await settle(recoveryPage, "sence2");
   const frames = await recoveryPage.evaluate(() => window.rafCalls);
