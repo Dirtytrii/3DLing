@@ -19,6 +19,8 @@ root = Path(__file__).resolve().parent.parent
 # Include Chinese UI / memories / letter plus basic Latin and punctuation.
 text = "".join(file.read_text(encoding="utf-8") for file in (root / "src").rglob("*.tsx"))
 text += "".join(file.read_text(encoding="utf-8") for file in (root / "src/data").glob("*.ts"))
+# Keep visual QA's explicitly temporary letter sample in the same typeface.
+text += "这是一段用于测试阅读焦点的排版文字。正式信件将保留原有段落与换行。"
 chars = set(range(0x20, 0x7F)) | {ord(char) for char in text if ord(char) >= 0x2000}
 chars |= set(range(0x2000, 0x2070)) | set(range(0x3000, 0x3040)) | set(range(0xFF01, 0xFF60))
 output = root / "public/fonts"
