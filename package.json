@@ -13,6 +13,7 @@
     "qa:scenes": "node scripts/qa-scene-matrix.mjs",
     "qa:gift": "node scripts/qa-gift.mjs",
     "qa:resources": "node scripts/qa-resources.mjs",
+    "qa:letter": "node scripts/qa-letter.mjs",
     "validate:asset-gate": "node scripts/validate-asset-gate.mjs",
     "validate:toys": "node scripts/validate-toy-assets.mjs",
     "preview": "vite preview --host 127.0.0.1"
