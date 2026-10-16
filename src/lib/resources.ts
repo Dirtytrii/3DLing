@@ -52,6 +52,7 @@ function loadFont(family: string, src: string): Promise<void> {
 
 export const giftImageSources = [...new Set([
   gift.art.loading, gift.art.intro, gift.art.birthday, gift.art.quiet, gift.art.paper, gift.art.envelope,
+  gift.art.stationery, gift.art.seal, gift.art.paperEdge, gift.art.letterPaper,
   ...scenes.flatMap((scene) => [scene.art.src, scene.toyDisplay!.imagePath, scene.mainPhoto, ...(scene.photoStack ?? [])]),
   ...wallPhotos.map((photo) => photo.src)
 ])];

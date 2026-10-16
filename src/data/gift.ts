@@ -12,6 +12,10 @@ export const gift = {
     loading: assetURL("/gift/loading-dream.png"),
     paper: assetURL("/gift/paper-texture.png"),
     envelope: assetURL("/gift/envelope-front.png"),
+    stationery: assetURL("/gift/envelope-stationery.png"),
+    seal: assetURL("/gift/star-wax-seal.png"),
+    paperEdge: assetURL("/gift/letter-stationery.png"),
+    letterPaper: assetURL("/gift/letter-cotton-texture.png"),
     // Normalized wick location in the production plate; flame is independent.
     candle: { x: 0.676, y: 0.27 }
   }
