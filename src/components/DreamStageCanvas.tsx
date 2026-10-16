@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import type { DreamScene } from "../data/dreamScenes";
+import { scenes, type DreamScene } from "../data/dreamScenes";
 import { coverPoint } from "../lib/cover";
+import { loadImage } from "../lib/resources";
 
-interface Props { scene: DreamScene; active: boolean; reducedMotion: boolean }
+interface StageProps { scene: DreamScene; active: boolean; reducedMotion: boolean }
+interface Props extends StageProps { prepare: boolean; onPrepared: (count: number) => void; onPrepareError: () => void }
 interface SpriteAsset { texture: THREE.Texture; aspect: number; top: number; bottom: number; center: number }
 interface Layer { group: THREE.Group; doll: THREE.Mesh; shadow: THREE.Mesh; scene: DreamScene; asset: SpriteAsset; opacity: number }
 
@@ -27,9 +29,9 @@ function inspectAlpha(image: HTMLImageElement): Omit<SpriteAsset, "texture"> {
 }
 
 /** One screen-space canvas; art and original toy pixels use identical cover math. */
-export function DreamStageCanvas({ scene, active, reducedMotion }: Props) {
+export function DreamStageCanvas({ scene, active, reducedMotion, prepare, onPrepared, onPrepareError }: Props) {
   const host = useRef<HTMLDivElement>(null);
-  const engine = useRef<{ update: (props: Props) => void } | null>(null);
+  const engine = useRef<{ update: (props: StageProps) => void; prepare: (report: (count: number) => void) => Promise<void> } | null>(null);
 
   useEffect(() => {
     const element = host.current!;
@@ -42,12 +44,12 @@ export function DreamStageCanvas({ scene, active, reducedMotion }: Props) {
     const world = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(0, 1, 1, 0, 0.1, 100);
     camera.position.z = 10;
-    const loader = new THREE.TextureLoader();
     const cache = new Map<string, Promise<SpriteAsset>>();
     const textures = new Set<THREE.Texture>();
+    let warmMaterial: THREE.MeshBasicMaterial | null = null;
     let layers: Layer[] = [];
-    let current: Props | null = null;
-    let disposed = false, sequence = 0, frame = 0, started = 0, duration = 700;
+    let current: StageProps | null = null;
+    let disposed = false, sequence = 0, frame = 0, started = 0, duration = 800;
     let width = 1, height = 1;
     const shadowCanvas = document.createElement("canvas");
     shadowCanvas.width = 128; shadowCanvas.height = 64;
@@ -101,14 +103,14 @@ export function DreamStageCanvas({ scene, active, reducedMotion }: Props) {
     };
     const start = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(animate); };
     const load = (src: string) => {
-      if (!cache.has(src)) cache.set(src, new Promise<SpriteAsset>((resolve, reject) => {
-        loader.load(src, (texture) => {
-          if (disposed) { texture.dispose(); return; }
-          texture.colorSpace = THREE.SRGBColorSpace;
-          textures.add(texture);
-          resolve({ texture, ...inspectAlpha(texture.image as HTMLImageElement) });
-        }, undefined, (error) => { cache.delete(src); reject(error); });
-      }));
+      if (!cache.has(src)) cache.set(src, loadImage(src).then((image) => {
+        if (disposed) throw new Error("Stage disposed");
+        const texture = new THREE.Texture(image);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.needsUpdate = true;
+        textures.add(texture);
+        return { texture, ...inspectAlpha(image) };
+      }).catch((error) => { cache.delete(src); throw error; }));
       return cache.get(src)!;
     };
     const resize = () => {
@@ -117,7 +119,25 @@ export function DreamStageCanvas({ scene, active, reducedMotion }: Props) {
       camera.right = width; camera.top = height; camera.updateProjectionMatrix();
       layers.forEach(place); render();
     };
-    engine.current = { update: (props) => {
+    engine.current = { prepare: async (report) => {
+      renderer.initTexture(shadowTexture);
+      let count = 0;
+      for (const item of scenes) {
+        const asset = await load(item.toyDisplay!.imagePath);
+        if (disposed) return;
+        renderer.initTexture(asset.texture);
+        if (count === 0) {
+          const warmScene = new THREE.Scene();
+          warmMaterial = new THREE.MeshBasicMaterial({ map: asset.texture, transparent: true, alphaTest: 0.04, depthWrite: false, depthTest: false, toneMapped: false });
+          const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), warmMaterial);
+          warmScene.add(mesh); renderer.compile(warmScene, camera);
+          mesh.geometry.dispose();
+        }
+        element.dataset.preparedTextures = String(++count);
+        report(count);
+        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      }
+    }, update: (props) => {
       const changed = current?.scene.id !== props.scene.id;
       current = props;
       element.dataset.stageActive = String(props.active);
@@ -125,6 +145,7 @@ export function DreamStageCanvas({ scene, active, reducedMotion }: Props) {
       const existing = layers[layers.length - 1];
       if (!changed && existing?.scene.id === props.scene.id) {
         resize();
+        if (props.reducedMotion) { started = 0; duration = 1; }
         if (element.dataset.spriteTransition === "transitioning") start();
         return;
       }
@@ -155,7 +176,7 @@ export function DreamStageCanvas({ scene, active, reducedMotion }: Props) {
         element.dataset.spriteAsset = display.imagePath;
         element.dataset.spriteScene = props.scene.id;
         element.dataset.stageProfile = props.scene.stage.profile ?? "default";
-        started = performance.now(); duration = props.reducedMotion ? 1 : 700; start();
+        started = performance.now(); duration = props.reducedMotion ? 1 : 800; start();
       }).catch(() => {
         if (!disposed && sequence === token) unavailable();
       });
@@ -166,11 +187,18 @@ export function DreamStageCanvas({ scene, active, reducedMotion }: Props) {
     return () => {
       disposed = true; sequence++; engine.current = null; cancelAnimationFrame(frame);
       observer.disconnect(); document.removeEventListener("visibilitychange", visibility);
-      layers.forEach(release); textures.forEach((texture) => texture.dispose()); shadowTexture.dispose(); renderer.dispose();
+      layers.forEach(release); textures.forEach((texture) => texture.dispose()); warmMaterial?.dispose(); shadowTexture.dispose(); renderer.dispose();
       renderer.domElement.remove();
     };
   }, []);
 
   useEffect(() => { engine.current?.update({ scene, active, reducedMotion }); }, [scene, active, reducedMotion]);
+  useEffect(() => {
+    if (!prepare) return;
+    if (!engine.current) { onPrepareError(); return; }
+    let cancelled = false;
+    void engine.current.prepare((count) => { if (!cancelled) onPrepared(count); }).catch(() => { if (!cancelled) onPrepareError(); });
+    return () => { cancelled = true; };
+  }, [prepare, onPrepared, onPrepareError]);
   return <div ref={host} className={`stage-canvas ${active ? "is-visible" : ""}`} aria-hidden="true" />;
 }

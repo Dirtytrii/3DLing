@@ -1,12 +1,18 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { DreamScene } from "../data/dreamScenes";
 import { ArrowIcon } from "./ArrowIcon";
 
 export function StorySection({ scene, active, previous, next, last }: { scene: DreamScene; active: boolean; previous: string; next: string; last: boolean }) {
   const gallery = useMemo(() => Array.from(new Set([scene.mainPhoto, ...(scene.photoStack ?? [])])), [scene.mainPhoto, scene.photoStack]);
-  const [selected, setSelected] = useState(0);
+  const [selection, setSelection] = useState<{ current: number; previous: number | null }>({ current: 0, previous: null });
+  const selected = selection.current;
   const backs = gallery.filter((_, index) => index !== selected).slice(0, 2);
-  const select = (step: number) => setSelected((index) => (index + step + gallery.length) % gallery.length);
+  const select = (step: number) => setSelection((value) => ({ current: (value.current + step + gallery.length) % gallery.length, previous: value.current }));
+  useEffect(() => {
+    if (selection.previous === null) return;
+    const timer = window.setTimeout(() => setSelection((value) => ({ ...value, previous: null })), 450);
+    return () => window.clearTimeout(timer);
+  }, [selection.current, selection.previous]);
   return (
     <section className={`story-section ${active ? "is-active" : ""}`} data-scene={scene.id} data-section={scene.id} id={scene.id}>
       <div className="memory-content">
@@ -15,6 +21,7 @@ export function StorySection({ scene, active, previous, next, last }: { scene: D
           <div className="photo-mat">
           {backs.map((photo, index) => <span key={photo} className={`photo-back photo-back-${index + 1}`} aria-hidden="true"><img src={photo} alt="" loading="lazy" decoding="async" /></span>)}
           <img key={gallery[selected]} className="photo-main-image" data-photo-main="true" src={gallery[selected]} alt={`${scene.title}主照片`} loading="lazy" decoding="async" />
+          {selection.previous !== null && <img key={`out-${gallery[selection.previous]}`} className="photo-main-image photo-departing" src={gallery[selection.previous]} alt="" aria-hidden="true" />}
           </div>
           {gallery.length > 1 && <figcaption className="photo-controls"><button type="button" onClick={() => select(-1)} aria-label={`查看${scene.title}上一张照片`}><ArrowIcon direction="left" /></button><span aria-live="polite">{selected + 1} / {gallery.length}</span><button type="button" onClick={() => select(1)} aria-label={`查看${scene.title}下一张照片`}><ArrowIcon /></button></figcaption>}
         </figure>
