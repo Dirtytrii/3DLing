@@ -1,4 +1,5 @@
 import { scenes as originals, type StoryScene } from "./scenes";
+import { assetURL } from "../lib/assets";
 
 export interface DreamArt {
   src: string;
@@ -22,10 +23,11 @@ const art: Record<string, DreamArt> = {
 
 export const scenes: DreamScene[] = originals.map((scene) => ({
   ...scene,
-  art: art[scene.id],
+  art: { ...art[scene.id], src: assetURL(art[scene.id].src) },
+  toyDisplay: scene.toyDisplay ? { ...scene.toyDisplay, imagePath: assetURL(scene.toyDisplay.imagePath) } : undefined,
   backgroundAsset: {
     ...scene.backgroundAsset!,
-    imagePath: art[scene.id].src,
+    imagePath: assetURL(art[scene.id].src),
     position: "center center",
     opacity: 1,
     mask: { left: 0, mid: 0, right: 0 }
