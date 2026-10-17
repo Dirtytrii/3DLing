@@ -57,7 +57,7 @@ export function LetterSection({ active, request, reducedMotion }: { active: bool
           <img className="wax-seal" src={gift.art.seal} alt="" />
         </div>
         <div className="letter-invitation">
-          <h2>给你的一封信</h2>
+          <h2>{gift.letter.title}</h2>
           <button className="button-primary" type="button" onClick={open}>打开信 <ArrowIcon direction="up-right" /></button>
         </div>
         <article ref={paperRef} className="letter-paper" aria-labelledby="letter-title" aria-hidden={state !== "reading"} inert={state !== "reading"}>
