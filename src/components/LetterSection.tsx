@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react"
 import { gift } from "../data/gift";
 import { ArrowIcon } from "./ArrowIcon";
 import { useReadingFocus } from "../lib/useReadingFocus";
+import { PaperBreeze } from "./PaperBreeze";
 
 type LetterState = "sealed" | "opening" | "reading";
 
@@ -60,6 +61,7 @@ export function LetterSection({ active, request, reducedMotion }: { active: bool
           <button className="button-primary" type="button" onClick={open}>打开信 <ArrowIcon direction="up-right" /></button>
         </div>
         <article ref={paperRef} className="letter-paper" aria-labelledby="letter-title" aria-hidden={state !== "reading"} inert={state !== "reading"}>
+          <PaperBreeze active={paperVisible && state === "reading"} reducedMotion={reducedMotion} />
           <header className="letter-paper-heading">
             <h2 id="letter-title" ref={heading} tabIndex={-1}>{gift.letter.title}</h2>
             <div className="letter-ornament" aria-hidden="true"><i /><svg viewBox="0 0 32 32"><path d="m16 1 2.8 11.2L30 16l-11.2 2.8L16 31l-2.8-12.2L2 16l11.2-3.8Z"/><path d="m5 5 22 22M27 5 5 27"/></svg><i /></div>
