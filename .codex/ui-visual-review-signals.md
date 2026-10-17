@@ -80,3 +80,18 @@ scope: this project
 recorded at: 2026-10-17
 
 以最新纠正为准：默认开启，移除右上角开关。新效果仍需用户在线验收，不自动记录为视觉接受或跨项目偏好。
+---
+workflow: ui-implementation-workflow-v2
+status: raw
+task: 2026-10-17 重做逐行读信效果
+page/surface: 给铃宝信纸阅读交互
+screenshot or artifact: ea99958 的段落柔光版本
+reviewer: 用户
+decision: rejected
+accepted aspects: 本条未新增视觉接受
+rejected aspects: 上一轮聚焦效果仍一般，需要认真重新设计
+reason in reviewer words: “这个效果也还是一般呢 好好设计一下”
+scope: this surface
+recorded at: 2026-10-17
+
+沿用用户此前明确的默认开启、无右上角开关和手动滚动约束；新逐行墨色版本未获用户视觉接受，需线上确认。
