@@ -110,3 +110,19 @@ scope: this surface
 recorded at: 2026-10-17
 
 本次调整纸面形变、明暗与悬浮阴影，继续保留原生文字和既有阅读约束。微风版本仍需用户线上确认，不将自动检查当作视觉接受。
+---
+workflow: ui-implementation-workflow-v2
+status: raw
+
+task: 2026-10-17 加强纸张微风幅度
+page/surface: 给铃宝展开后的纸面动效
+screenshot or artifact: c9df170 的 18 秒微风版本
+reviewer: 用户
+decision: rejected
+accepted aspects: 本条没有新增视觉接受
+rejected aspects: 微风幅度不够明显
+reason in reviewer words: “动效幅度不明显呢”
+scope: this surface
+recorded at: 2026-10-17
+
+本轮仅加强纸面形变、姿态与光影，继续保持原生文字稳定和原有阅读行为；自动检查不代表用户接受。
