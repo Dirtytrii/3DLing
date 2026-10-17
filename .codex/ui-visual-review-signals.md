@@ -94,4 +94,19 @@ reason in reviewer words: “这个效果也还是一般呢 好好设计一下�
 scope: this surface
 recorded at: 2026-10-17
 
-沿用用户此前明确的默认开启、无右上角开关和手动滚动约束；新逐行墨色版本未获用户视觉接受，需线上确认。
+沿用用户此前明确的默认开启、无右上角开关和手动滚动约束；新逐行墨色版本未获用户视觉接受，需线上确认。---
+workflow: ui-implementation-workflow-v2
+status: raw
+
+task: 2026-10-17 悬挂软纸与微风
+page/surface: 给铃宝展开后的信纸材质
+screenshot or artifact: 511da57 的静态纸张
+reviewer: 用户
+decision: rejected
+accepted aspects: 本条没有新增视觉接受
+rejected aspects: 纸张过硬，希望柔软悬挂并被微风吹拂
+reason in reviewer words: “我想要柔软纸张悬挂在那里然后被微风吹拂的感觉能做吗？现在这张纸太硬了”
+scope: this surface
+recorded at: 2026-10-17
+
+本次调整纸面形变、明暗与悬浮阴影，继续保留原生文字和既有阅读约束。微风版本仍需用户线上确认，不将自动检查当作视觉接受。
