@@ -64,3 +64,19 @@ scope: this project
 recorded at: 2026-10-16
 
 用户在本轮选项中明确选择：“只做聚焦，保留手动滚动（推荐）”。本次新信封、信纸和聚焦效果仍待用户体验；不自动转换为跨项目偏好。
+
+---
+workflow: ui-implementation-workflow-v2
+status: raw
+task: 2026-10-17 信件聚焦效果细化
+page/surface: 给铃宝信纸与段落聚焦
+screenshot or artifact: 本会话 64bb3d3 的实际信件预览
+reviewer: 用户
+decision: mixed
+accepted aspects: 保留段落聚焦，纠正为默认开启
+rejected aspects: 现有聚焦视觉效果，以及纸面右上角开关
+reason in reviewer words: “聚焦的效果不太好看 而且不应该放开关在右上角 默认关闭就行”；随后纠正：“说错了 默认要开启 然后精美一下聚焦的效果”
+scope: this project
+recorded at: 2026-10-17
+
+以最新纠正为准：默认开启，移除右上角开关。新效果仍需用户在线验收，不自动记录为视觉接受或跨项目偏好。
