@@ -97,6 +97,14 @@ try {
     await long.goto(`${url}/#letter`); await ready(long);
     await long.locator("#letter .letter-invitation button").click(); await reading(long);
     await long.locator(".letter-body.has-reading-focus").waitFor();
+    await long.locator('.paper-fabric[data-breeze="running"]').waitFor();
+    const beforeWind = await long.locator('[data-letter-paragraph="0"]').boundingBox();
+    const windTime = await long.locator(".paper-wind-defs").evaluate((node) => node.getCurrentTime());
+    const materialTransform = await long.locator(".paper-fabric").evaluate((node) => getComputedStyle(node).transform);
+    await long.waitForTimeout(350);
+    assert.ok(await long.locator(".paper-wind-defs").evaluate((node) => node.getCurrentTime()) > windTime + .2, "Native paper deformation runs while reading");
+    assert.notEqual(await long.locator(".paper-fabric").evaluate((node) => getComputedStyle(node).transform), materialTransform, "Paper catches a gentle breeze");
+    assert.deepEqual(await long.locator('[data-letter-paragraph="0"]').boundingBox(), beforeWind, "The moving material never moves native text");
     assert.equal(await long.getByRole("button", { name: "聚焦阅读" }).count(), 0, "Reading focus is on by default without a paper control");
     assert.equal(await long.locator(".reading-lamp").count(), 0, "No floating paragraph glow");
     assert.equal(await long.locator(".reading-guide").count(), 1, "A single decorative star follows the reading line");
@@ -185,18 +193,26 @@ try {
       getSelection().removeAllRanges(); getSelection().addRange(range);
     });
     await long.locator(".letter-body.has-selection").waitFor();
+    await long.locator('.paper-fabric[data-breeze="paused"]').waitFor();
+    assert.equal(await long.locator(".paper-wind-defs").evaluate((node) => node.animationsPaused()), true, "Selecting text pauses the breeze");
+    const pausedTime = await long.locator(".paper-wind-defs").evaluate((node) => node.getCurrentTime());
+    await long.waitForTimeout(120);
+    assert.equal(await long.locator(".paper-wind-defs").evaluate((node) => node.getCurrentTime()), pausedTime, "Paused paper does not keep deforming");
     assert.equal(await long.evaluate(() => getSelection().toString()), await long.locator("[data-reading-current]").textContent(), "Selection preserves a single native copy of the text");
     await long.waitForFunction(() => getComputedStyle(document.querySelector(".reading-guide")).opacity === "0");
     assert.equal(await long.locator(".reading-guide").evaluate((node) => getComputedStyle(node).opacity), "0");
     assert.equal(await long.locator("[data-reading-current]").evaluate((node) => getComputedStyle(node).webkitTextFillColor), "rgb(67, 45, 73)", "Selected text restores solid ink");
     await long.evaluate(() => getSelection().removeAllRanges());
     await long.locator(".letter-body.has-selection").waitFor({ state: "hidden" });
+    await long.locator('.paper-fabric[data-breeze="running"]').waitFor();
     const textStyles = await long.locator("[data-letter-paragraph]").evaluateAll((nodes) => nodes.map((node) => {
       const style = getComputedStyle(node); return { opacity: style.opacity, filter: style.filter, weight: style.fontWeight };
     }));
     assert.ok(textStyles.every((style) => style.opacity === "1" && style.filter === "none"), "Every paragraph remains fully opaque and sharp");
     assert.equal(new Set(textStyles.map((style) => style.weight)).size, 1, "Focus never shifts layout through font weight");
     await long.emulateMedia({ reducedMotion: "reduce" });
+    await long.locator('.paper-fabric[data-breeze="paused"]').waitFor();
+    assert.equal(await long.locator(".paper-fabric").evaluate((node) => getComputedStyle(node).filter), "none", "Reduced motion restores an undeformed paper surface");
     assert.ok(parseFloat(await long.locator(".reading-guide").evaluate((node) => getComputedStyle(node).transitionDuration)) <= .001);
     await long.locator(".letter-pager").scrollIntoViewIfNeeded();
     await long.waitForFunction(() => {
@@ -214,7 +230,7 @@ try {
     assert.equal(await long.locator("[data-reading-current]").count(), 0, "Leaving the letter cleans focus state");
     assert.equal(await long.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     results.push({ viewport, envelope, button, footer, longHeight: paper.height });
-    console.log(`PASS ${viewport.width}x${viewport.height}: stationery, long letter, real line focus, pointer dwell, aligned star, clear native text, selection, reduced motion and leaving`);
+    console.log(`PASS ${viewport.width}x${viewport.height}: soft paper breeze, stable text, stationery, long letter, line focus, selection, reduced motion and leaving`);
     await context.close();
   }
 
