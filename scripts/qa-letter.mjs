@@ -96,12 +96,14 @@ try {
     await long.goto(`${url}/#letter`); await ready(long);
     await long.locator("#letter .letter-invitation button").click(); await reading(long);
     await long.locator(".letter-body.has-reading-focus").waitFor();
+    assert.equal(await long.getByRole("button", { name: "聚焦阅读" }).count(), 0, "Reading focus is on by default without a paper control");
+    assert.equal(await long.locator(".reading-lamp").evaluate((node) => getComputedStyle(node, "::before").content), "none", "No gold side marker");
     assert.equal(await long.locator("[data-letter-paragraph]").count(), 24);
     assert.equal(await long.evaluate(() => window.unwanted), undefined);
     const paper = await long.locator(".letter-paper").boundingBox();
     assert.ok(paper.height > viewport.height * 4, "Long letter naturally extends the page");
     assert.equal(await long.locator(".letter-body").evaluate((node) => getComputedStyle(node).overflowY), "visible");
-    await long.locator('[data-letter-paragraph="1"]').hover(); await long.waitForTimeout(400);
+    await long.locator('[data-letter-paragraph="1"]').hover(); await long.waitForTimeout(650);
     await long.screenshot({ path: path.join(outDir, `${viewport.width}x${viewport.height}-long-start.png`) });
     await long.mouse.move(50, 100);
     await long.waitForTimeout(100);
@@ -117,7 +119,7 @@ try {
     const target = visible.find((index) => String(index) !== currentFocus) ?? visible[0];
     await long.locator(`[data-letter-paragraph="${target}"]`).hover();
     await long.waitForFunction((index) => document.querySelector(".letter-body").dataset.focusedParagraph === String(index) && document.querySelector(".letter-body").dataset.focusSource === "pointer", target);
-    await long.waitForTimeout(400);
+    await long.waitForTimeout(650);
     assert.equal(await long.evaluate(() => scrollY), beforeHover, "Pointer focus never auto-scrolls");
     assert.equal(await long.locator("[data-reading-current]").count(), 1);
     await long.screenshot({ path: path.join(outDir, `${viewport.width}x${viewport.height}-long-focus.png`) });
@@ -132,20 +134,15 @@ try {
       getSelection().removeAllRanges(); getSelection().addRange(range);
     });
     await long.locator(".letter-body.has-selection").waitFor();
-    await long.waitForTimeout(350);
+    await long.waitForFunction(() => getComputedStyle(document.querySelector(".reading-lamp")).opacity === "0");
     assert.equal(await long.locator(".reading-lamp").evaluate((node) => getComputedStyle(node).opacity), "0");
     await long.evaluate(() => getSelection().removeAllRanges());
     await long.locator(".letter-body.has-selection").waitFor({ state: "hidden" });
-    await long.getByRole("button", { name: "聚焦阅读", exact: true }).click();
-    assert.equal(await long.getByRole("button", { name: "聚焦阅读" }).getAttribute("aria-pressed"), "false");
-    assert.equal(await long.locator("[data-reading-current]").count(), 0);
-    await long.getByRole("button", { name: "聚焦阅读" }).press("Enter");
-    assert.equal(await long.getByRole("button", { name: "聚焦阅读" }).getAttribute("aria-pressed"), "true");
-    await long.locator(".letter-body.has-reading-focus").waitFor({ timeout: 3000 }).catch(async (error) => {
-      console.error("Focus re-enable state", await long.evaluate(() => ({ active: document.querySelector(".app-shell").dataset.activeSection, top: document.getElementById("letter").getBoundingClientRect().top, paperTop: document.querySelector(".letter-paper").getBoundingClientRect().top, bodyClass: document.querySelector(".letter-body").className, visible: !document.hidden })));
-      await long.screenshot({ path: path.join(outDir, "focus-re-enable-failure.png") });
-      throw error;
-    });
+    const textStyles = await long.locator("[data-letter-paragraph]").evaluateAll((nodes) => nodes.map((node) => {
+      const style = getComputedStyle(node); return { opacity: style.opacity, filter: style.filter, weight: style.fontWeight };
+    }));
+    assert.ok(textStyles.every((style) => style.opacity === "1" && style.filter === "none"), "Every paragraph remains fully opaque and sharp");
+    assert.equal(new Set(textStyles.map((style) => style.weight)).size, 1, "Focus never shifts layout through font weight");
     await long.emulateMedia({ reducedMotion: "reduce" });
     assert.ok(parseFloat(await long.locator(".reading-lamp").evaluate((node) => getComputedStyle(node).transitionDuration)) <= .001);
     await long.locator(".letter-pager").scrollIntoViewIfNeeded();
@@ -164,7 +161,7 @@ try {
     assert.equal(await long.locator("[data-reading-current]").count(), 0, "Leaving the letter cleans focus state");
     assert.equal(await long.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     results.push({ viewport, envelope, button, footer, longHeight: paper.height });
-    console.log(`PASS ${viewport.width}x${viewport.height}: stationery, wax/flap, long letter, wheel/pointer focus, selection, toggle, reduced motion and leaving`);
+    console.log(`PASS ${viewport.width}x${viewport.height}: stationery, wax/flap, long letter, default focus without controls or side marker, wheel/pointer, clear text, selection, reduced motion and leaving`);
     await context.close();
   }
 
