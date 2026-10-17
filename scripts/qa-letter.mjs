@@ -45,8 +45,9 @@ async function fixture(page, body) {
   await page.route("**/src/data/gift.ts*", async (route) => {
     const response = await route.fetch();
     const source = await response.text();
-    assert.match(source, /body:\s*""/);
-    await route.fulfill({ response, body: source.replace(/body:\s*""/, () => `body: ${JSON.stringify(body)}`) });
+    const bodyField = /body:\s*"(?:\\.|[^"\\])*"/;
+    assert.match(source, bodyField);
+    await route.fulfill({ response, body: source.replace(bodyField, () => `body: ${JSON.stringify(body)}`) });
   });
 }
 function watch(page) {
@@ -65,6 +66,7 @@ try {
       window.requestAnimationFrame = (callback) => original((time) => { window.rafCalls++; callback(time); });
     });
     const page = await context.newPage(); watch(page);
+    await fixture(page, "");
     await page.goto(`${url}/#letter`); await ready(page);
     const envelope = await page.locator(".envelope-rig").boundingBox();
     const button = await page.locator("#letter .letter-invitation button").boundingBox();

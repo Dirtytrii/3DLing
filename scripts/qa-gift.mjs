@@ -112,7 +112,7 @@ try {
       if (id === "letter") {
         await page.locator("#letter .letter-invitation button").click();
         await page.waitForFunction(() => document.querySelector("#letter").dataset.letterState === "reading");
-        assert.equal(await page.locator(".letter-placeholder").textContent(), "信件原文待放入");
+        assert.ok(await page.locator(".letter-body p").count() > 0, "Letter body or empty placeholder renders");
         await page.waitForTimeout(500);
       }
       await page.screenshot({ path: path.join(outDir, `${size.width}x${size.height}-${id}.png`) });
@@ -267,8 +267,9 @@ try {
   await longPage.route("**/src/data/gift.ts*", async (route) => {
     const response = await route.fetch();
     const source = await response.text();
-    assert.match(source, /body:\s*""/, "Empty letter fixture slot");
-    await route.fulfill({ response, body: source.replace(/body:\s*""/, () => `body: ${JSON.stringify(letter)}`) });
+    const bodyField = /body:\s*"(?:\\.|[^"\\])*"/;
+    assert.match(source, bodyField, "Plaintext letter fixture slot");
+    await route.fulfill({ response, body: source.replace(bodyField, () => `body: ${JSON.stringify(letter)}`) });
   });
   await longPage.goto(`${url}/#letter`); await settle(longPage, "letter");
   await longPage.locator("#letter .letter-invitation button").click();
