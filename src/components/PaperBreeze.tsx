@@ -13,6 +13,7 @@ export function PaperBreeze({ active, reducedMotion }: { active: boolean; reduce
   const svgRef = useRef<SVGSVGElement>(null);
   const materialRef = useRef<HTMLDivElement>(null);
   const maskRef = useRef<SVGFEImageElement>(null);
+  const filterRef = useRef<SVGFilterElement>(null);
 
   useEffect(() => {
     const material = materialRef.current, mask = maskRef.current;
@@ -26,6 +27,10 @@ export function PaperBreeze({ active, reducedMotion }: { active: boolean; reduce
       mask.setAttribute("width", String(width));
       mask.setAttribute("height", String(height));
       mask.setAttribute("href", suspensionMask(height));
+      filterRef.current?.setAttribute("width", String(width + 192));
+      filterRef.current?.setAttribute("height", String(height + 192));
+      // Keep the larger hanging sway within the reading margins on very long sheets.
+      material.style.setProperty("--paper-sway-gain", String(Math.min(1, 24 / (height * Math.tan(.65 * Math.PI / 180)))));
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -58,18 +63,18 @@ export function PaperBreeze({ active, reducedMotion }: { active: boolean; reduce
   return <>
     <svg ref={svgRef} className="paper-wind-defs" aria-hidden="true" focusable="false">
       <defs>
-        <filter id={id} x="-5%" y="-3%" width="110%" height="106%" colorInterpolationFilters="sRGB">
+        <filter ref={filterRef} id={id} filterUnits="userSpaceOnUse" x="-96" y="-96" width="972" height="802" colorInterpolationFilters="sRGB">
           <feTurbulence type="fractalNoise" baseFrequency=".003 .0015" numOctaves="1" seed="8" result="grain" />
           <feOffset in="grain" result="drift">
-            <animate attributeName="dx" values="0;36;0;-32;0" dur="18s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.25;.5;.75;1" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1" />
-            <animate attributeName="dy" values="0;24;0;-18;0" dur="18s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.25;.5;.75;1" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1" />
+            <animate attributeName="dx" values="0;48;0;-40;0" dur="12s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.25;.5;.75;1" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1" />
+            <animate attributeName="dy" values="0;32;0;-26;0" dur="12s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.25;.5;.75;1" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1" />
           </feOffset>
           <feImage ref={maskRef} href={initialSuspension} x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="suspension" />
           <feComposite in="drift" in2="suspension" operator="in" result="bending" />
           <feFlood floodColor="#808080" result="neutral" />
           <feComposite in="bending" in2="neutral" operator="over" result="wind" />
-          <feDisplacementMap in="SourceGraphic" in2="wind" scale="44" xChannelSelector="R" yChannelSelector="G">
-            <animate attributeName="scale" values="44;62;46;58;44" dur="18s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.25;.5;.75;1" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1" />
+          <feDisplacementMap in="SourceGraphic" in2="wind" scale="-110" xChannelSelector="R" yChannelSelector="G">
+            <animate attributeName="scale" values="-110;160;65;-140;-110" dur="12s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.25;.5;.75;1" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1" />
           </feDisplacementMap>
         </filter>
       </defs>
