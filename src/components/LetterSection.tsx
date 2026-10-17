@@ -11,12 +11,11 @@ export function LetterSection({ active, request, reducedMotion }: { active: bool
   const heading = useRef<HTMLHeadingElement>(null);
   const paperRef = useRef<HTMLElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
-  const [focusEnabled, setFocusEnabled] = useState(true);
   const [paperVisible, setPaperVisible] = useState(false);
   const open = () => setState(reducedMotion ? "reading" : "opening");
   const body: string = gift.letter.body;
   const paragraphs = useMemo(() => body.trim() ? body.split(/\n\s*\n/).filter((paragraph) => paragraph.trim()) : [], [body]);
-  useReadingFocus(bodyRef, paperVisible && state === "reading" && focusEnabled && paragraphs.length > 1, body);
+  useReadingFocus(bodyRef, paperVisible && state === "reading" && paragraphs.length > 1, body);
 
   useEffect(() => {
     if (state !== "reading" || !paperRef.current) { setPaperVisible(false); return; }
@@ -65,7 +64,6 @@ export function LetterSection({ active, request, reducedMotion }: { active: bool
             <h2 id="letter-title" ref={heading} tabIndex={-1}>{gift.letter.title}</h2>
             <div className="letter-ornament" aria-hidden="true"><i /><svg viewBox="0 0 32 32"><path d="m16 1 2.8 11.2L30 16l-11.2 2.8L16 31l-2.8-12.2L2 16l11.2-3.8Z"/><path d="m5 5 22 22M27 5 5 27"/></svg><i /></div>
           </header>
-          {state === "reading" && paragraphs.length > 1 && <button className="reading-focus-control" type="button" aria-pressed={focusEnabled} onClick={() => setFocusEnabled((value) => !value)}><span aria-hidden="true" />聚焦阅读</button>}
           {state === "reading" && <div ref={bodyRef} className="letter-body">
             <div className="reading-lamp" aria-hidden="true" />
             {paragraphs.length ? paragraphs.map((paragraph, index) => <p key={index} data-letter-paragraph={index}>{paragraph}</p>) : <p className="letter-placeholder">信件原文待放入</p>}
