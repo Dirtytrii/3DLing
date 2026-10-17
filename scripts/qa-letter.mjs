@@ -6,8 +6,8 @@ import net from "node:net";
 import path from "node:path";
 import assert from "node:assert/strict";
 
-// IAB interaction passes first. Its screenshot can lag the DOM; use fresh Chrome
-// for deterministic desktop frames and temporary plaintext-letter fixtures.
+// Prefer the native browser for interaction. When unavailable or its frame lags
+// the DOM, use this fresh Chrome lane with temporary plaintext-letter fixtures.
 const outDir = path.join(tmpdir(), `3dling-letter-qa-${Date.now()}`);
 mkdirSync(outDir, { recursive: true });
 console.log(`Evidence: ${outDir}`);
@@ -56,6 +56,7 @@ function watch(page) {
   page.on("response", (response) => { if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`); });
 }
 const focus = (page) => page.locator(".letter-body").getAttribute("data-focused-paragraph");
+const lineFocus = (page) => page.locator(".letter-body").getAttribute("data-focused-line");
 
 try {
   for (const viewport of sizes) {
@@ -97,7 +98,8 @@ try {
     await long.locator("#letter .letter-invitation button").click(); await reading(long);
     await long.locator(".letter-body.has-reading-focus").waitFor();
     assert.equal(await long.getByRole("button", { name: "聚焦阅读" }).count(), 0, "Reading focus is on by default without a paper control");
-    assert.equal(await long.locator(".reading-lamp").evaluate((node) => getComputedStyle(node, "::before").content), "none", "No gold side marker");
+    assert.equal(await long.locator(".reading-lamp").count(), 0, "No floating paragraph glow");
+    assert.equal(await long.locator(".reading-guide").count(), 1, "A single decorative star follows the reading line");
     assert.equal(await long.locator("[data-letter-paragraph]").count(), 24);
     assert.equal(await long.evaluate(() => window.unwanted), undefined);
     const paper = await long.locator(".letter-paper").boundingBox();
@@ -122,20 +124,71 @@ try {
     await long.waitForTimeout(650);
     assert.equal(await long.evaluate(() => scrollY), beforeHover, "Pointer focus never auto-scrolls");
     assert.equal(await long.locator("[data-reading-current]").count(), 1);
+    // A line inside one paragraph is the interaction unit, not its whole box.
+    const linePoints = await long.locator(`[data-letter-paragraph="${target}"]`).evaluate((node) => {
+      const range = document.createRange(); range.selectNodeContents(node);
+      const points = [];
+      for (const rect of range.getClientRects()) {
+        if (rect.width < 1 || rect.height < 1 || points.some((point) => Math.abs(point.y - (rect.top + rect.height / 2)) < 1)) continue;
+        points.push({ x: rect.left + Math.min(20, rect.width / 2), y: rect.top + rect.height / 2 });
+      }
+      return points;
+    });
+    assert.ok(linePoints.length >= 2);
+    await long.mouse.move(linePoints[0].x, linePoints[0].y);
+    await long.waitForTimeout(220);
+    const firstLine = await lineFocus(long);
+    await long.mouse.move(linePoints[1].x, linePoints[1].y);
+    await long.waitForTimeout(60);
+    assert.equal(await lineFocus(long), firstLine, "Pointer needs a brief deliberate dwell");
+    await long.waitForFunction((line) => document.querySelector(".letter-body").dataset.focusedLine !== line, firstLine);
+    assert.equal(await focus(long), String(target), "Line focus can change without changing paragraphs");
+    await long.waitForTimeout(650);
+    const guide = await long.locator(".reading-guide").boundingBox();
+    assert.ok(Math.abs(guide.y + guide.height / 2 - linePoints[1].y) < 2, "Star aligns with the actual text line");
+    const settledLine = await lineFocus(long);
+    await long.mouse.move(linePoints[0].x, linePoints[0].y);
+    await long.waitForTimeout(45);
+    await long.mouse.move(linePoints[1].x, linePoints[1].y);
+    await long.waitForTimeout(220);
+    assert.equal(await lineFocus(long), settledLine, "Returning to the current line cancels a pending hover");
+    await long.mouse.move(linePoints[0].x, linePoints[0].y);
+    await long.waitForTimeout(45);
+    const bodyBounds = await long.locator(".letter-body").boundingBox();
+    await long.mouse.move(bodyBounds.x - 20, linePoints[0].y);
+    await long.waitForTimeout(220);
+    assert.equal(await long.locator(".letter-body").getAttribute("data-focus-source"), "scroll", "Leaving text cancels a pending hover");
+    await long.mouse.move(linePoints[1].x, linePoints[1].y);
+    await long.waitForTimeout(220);
+    assert.match(await long.locator(`[data-letter-paragraph="${target}"]`).evaluate((node) => getComputedStyle(node).backgroundImage), /linear-gradient/, "Ink treatment is clipped inside native text");
     await long.screenshot({ path: path.join(outDir, `${viewport.width}x${viewport.height}-long-focus.png`) });
     const idleFrames = await long.evaluate(() => window.rafCalls);
     await long.waitForTimeout(400);
     assert.equal(await long.evaluate(() => window.rafCalls), idleFrames, "Paragraph focus has no idle RAF loop");
     await long.mouse.wheel(0, 300); await long.waitForTimeout(350);
     assert.equal(await long.locator(".letter-body").getAttribute("data-focus-source"), "scroll", "Manual scrolling takes priority over a resting pointer");
-    // A native selection must remain readable and suppress the decorative lamp.
+    const beforeJitter = await lineFocus(long);
+    const jitter = await long.locator(".letter-body").evaluate((node) => {
+      const top = parseFloat(node.style.getPropertyValue("--reading-line-top"));
+      const height = parseFloat(node.style.getPropertyValue("--reading-line-height"));
+      return { y: scrollY + node.getBoundingClientRect().top + top + height * 1.08 - innerHeight * .48, height };
+    });
+    await long.evaluate((y) => scrollTo({ top: y, behavior: "instant" }), jitter.y);
+    await long.waitForTimeout(120);
+    assert.equal(await lineFocus(long), beforeJitter, "Small motion across a line boundary stays within its hysteresis");
+    await long.evaluate((y) => scrollTo({ top: y, behavior: "instant" }), jitter.y - jitter.height * .16);
+    await long.waitForTimeout(120);
+    assert.equal(await lineFocus(long), beforeJitter, "Small reverse motion does not flicker between lines");
+    // A native selection must remain readable and suppress the decorative guide.
     await long.locator("[data-reading-current]").evaluate((node) => {
       const range = document.createRange(); range.selectNodeContents(node);
       getSelection().removeAllRanges(); getSelection().addRange(range);
     });
     await long.locator(".letter-body.has-selection").waitFor();
-    await long.waitForFunction(() => getComputedStyle(document.querySelector(".reading-lamp")).opacity === "0");
-    assert.equal(await long.locator(".reading-lamp").evaluate((node) => getComputedStyle(node).opacity), "0");
+    assert.equal(await long.evaluate(() => getSelection().toString()), await long.locator("[data-reading-current]").textContent(), "Selection preserves a single native copy of the text");
+    await long.waitForFunction(() => getComputedStyle(document.querySelector(".reading-guide")).opacity === "0");
+    assert.equal(await long.locator(".reading-guide").evaluate((node) => getComputedStyle(node).opacity), "0");
+    assert.equal(await long.locator("[data-reading-current]").evaluate((node) => getComputedStyle(node).webkitTextFillColor), "rgb(67, 45, 73)", "Selected text restores solid ink");
     await long.evaluate(() => getSelection().removeAllRanges());
     await long.locator(".letter-body.has-selection").waitFor({ state: "hidden" });
     const textStyles = await long.locator("[data-letter-paragraph]").evaluateAll((nodes) => nodes.map((node) => {
@@ -144,7 +197,7 @@ try {
     assert.ok(textStyles.every((style) => style.opacity === "1" && style.filter === "none"), "Every paragraph remains fully opaque and sharp");
     assert.equal(new Set(textStyles.map((style) => style.weight)).size, 1, "Focus never shifts layout through font weight");
     await long.emulateMedia({ reducedMotion: "reduce" });
-    assert.ok(parseFloat(await long.locator(".reading-lamp").evaluate((node) => getComputedStyle(node).transitionDuration)) <= .001);
+    assert.ok(parseFloat(await long.locator(".reading-guide").evaluate((node) => getComputedStyle(node).transitionDuration)) <= .001);
     await long.locator(".letter-pager").scrollIntoViewIfNeeded();
     await long.waitForFunction(() => {
       const bounds = document.querySelector(".letter-pager").getBoundingClientRect();
@@ -161,7 +214,7 @@ try {
     assert.equal(await long.locator("[data-reading-current]").count(), 0, "Leaving the letter cleans focus state");
     assert.equal(await long.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     results.push({ viewport, envelope, button, footer, longHeight: paper.height });
-    console.log(`PASS ${viewport.width}x${viewport.height}: stationery, wax/flap, long letter, default focus without controls or side marker, wheel/pointer, clear text, selection, reduced motion and leaving`);
+    console.log(`PASS ${viewport.width}x${viewport.height}: stationery, long letter, real line focus, pointer dwell, aligned star, clear native text, selection, reduced motion and leaving`);
     await context.close();
   }
 
@@ -179,6 +232,13 @@ try {
   assert.equal(await page.locator("[data-letter-paragraph]").count(), 1, "A long single paragraph is not artificially paginated");
   assert.equal(await page.getByRole("button", { name: "聚焦阅读" }).count(), 0);
   assert.ok((await page.locator(".letter-paper").boundingBox()).height > 1000);
+  await page.locator(".letter-body.has-reading-focus").waitFor();
+  assert.ok(Number(await lineFocus(page)) >= 0, "One long paragraph also gets native line focus");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.waitForFunction(() => {
+    const body = document.querySelector(".letter-body");
+    return parseFloat(body.style.getPropertyValue("--reading-line-height")) === parseFloat(getComputedStyle(body.querySelector("p")).lineHeight);
+  });
   await page.waitForTimeout(400);
   const frames = await page.evaluate(() => window.rafCalls);
   await page.waitForTimeout(500);
